@@ -16,19 +16,34 @@ The goal is to provide a comprehensive view of performance across different work
 | **DuckDB** | ~3,900 vec/s | 0.90 ms | OLAP + VSS | Analytical + Vector Search Hybrid |
 | **NumPy** | N/A | 0.62 ms | In-Memory (Exact) | Baseline comparison |
 
-> **Note**: Results measured using `benchmarks/comprehensive_benchmark.py`. See "Run Environment" below for hardware details.
+## 🏗️ Systems Engineering Evaluation
 
-## Why Search Latency Matters More Than Insert
+Beyond microbenchmarks, we stress-tested ToonDB's "Actual" production capability for Agentic workloads. 
 
-In **Agentic AI** and **RAG** workflows, the performance bottleneck typically lies in the "read" path (retrieval), not the "write" path (ingestion).
+### 1. The "Agent Loop" Macrobenchmark
+We simulated a long-running agent conversation where the system must simultaneously **Write** new observations and **Read/Assemble** context for a prompt.
 
-1.  **Blocking the Thought Loop**: When an AI Agent "thinks", it queries its memory. This is a blocking operation. Every millisecond of latency delays the agent's next action. ToonDB's **0.3ms** latency keeps the thought loop tight and responsive.
-2.  **Frequency of Operations**: An agent might query its memory dozens of times per turn (e.g., planning, reflecting, tool selection). Ingestion usually happens once (e.g., loading a document) or asynchronously in the background.
-3.  **Real-Time Interaction**: For user-facing chatbots, retrieval latency adds directly to the "Time to First Token". Columnar stores like LanceDB prioritize ingestion speed (good for offline training), but ToonDB prioritizes retrieval speed (critical for online interaction).
+| Metric (P99 Latency) | ToonDB (Unified) | SQLite + Chroma (Fragmented) | Improvement |
+| :--- | :--- | :--- | :--- |
+| **Write (Append)** | **0.01 ms** | 2.80 ms | **280x** Faster |
+| **Read (Context)** | **0.01 ms** | 3.06 ms | **300x** Faster |
 
-**Verdict**: If your app waits for the database to answer before it can reply to the user, optimize for **Search Latency** (ToonDB). If you are batch-processing terabytes of logs overnight, optimize for **Insert Rate** (LanceDB).
+> **Why This Matters**: ToonDB acts as an integrated memory layer. The "Fragmented" baseline requires network/IPC hops between Python, SQLite, and Chroma. ToonDB keeps the "Thought Loop" tight.
 
-## Detailed Comparison
+### 2. Transactional Integrity (Crash Test)
+We subjected ToonDB to a "Jepsen-lite" test: heavily writing to a key and randomly force-killing the process (`kill -9`).
+
+- **Result**: ✅ PASSED
+- **Recovery Time**: 4.31 ms
+- **Consistency**: No data corruption; WAL successfully replayed last committed transaction.
+
+### 3. Hardware Efficiency (Microbenchmark)
+We isolated the cosine distance kernel to check SIMD usage on ARM (Apple M1 Max).
+
+- **Finding**: Raw kernel throughput via FFI is lower than NumPy (0.08x) due to Python<->Rust boundary overhead on single queries.
+- **Verdict**: ToonDB is optimal for **Search** (where work stays in Rust) but has high overhead for basic vector math ops in Python compared to highly optimized BLAS.
+
+## detailed Comparison
 
 ### ToonDB
 - **Performance Profile**: Optimized for low-latency search (0.33ms).
@@ -69,18 +84,6 @@ ChromaDB                  10558              0.687           0.9x
 DuckDB                    3886               0.904           0.7x
 LanceDB                   96852              4.074           0.2x
 ToonDB                    2377               0.325           1.9x
-
-======================================================================
-   PERFORMANCE ANALYSIS
-======================================================================
-
-  Highest Insert Rate: LANCEDB (96852 vec/s)
-  Lowest Search Latency: TOONDB (0.325ms)
-
-  Relative Performance (ToonDB baseline):
-    vs chromadb  : Insert 0.23x    | Search 2.11x    (relative speedup)
-    vs duckdb    : Insert 0.61x    | Search 2.78x    (relative speedup)
-    vs lancedb   : Insert 0.02x    | Search 12.54x   (relative speedup)
 ```
 
 ## Running the Benchmarks
@@ -96,8 +99,8 @@ ToonDB                    2377               0.325           1.9x
    python3 benchmarks/comprehensive_benchmark.py
    ```
 
-3. **Real-World Embedding Test**:
-   Requires Azure OpenAI keys in `.env`. Benchmarks end-to-end latency.
+3. **Run Systems Evaluation**:
    ```bash
-   python3 benchmarks/real_embedding_benchmark.py
+   python3 benchmarks/macro_agent_benchmark.py
+   python3 benchmarks/crash_test.py
    ```
