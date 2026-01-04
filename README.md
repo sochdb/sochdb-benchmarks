@@ -1,8 +1,16 @@
 # ToonDB Benchmarks
 
-This repository contains reproducible benchmarks comparing **ToonDB** against other vector stores: **ChromaDB**, **LanceDB**, **DuckDB**, and **SQLite (VSS)**.
+This repository contains reproducible benchmarks comparing **ToonDB** against other vector stores and agent memory systems.
 
-The goal is to provide a comprehensive view of performance across different workloads: write-heavy, read-heavy, memory-constrained, and on-disk persistence.
+**📊 [See Published Results](PUBLISHED_RESULTS.md)** - Comprehensive benchmark findings with real LLM integration
+
+## Overview
+
+We provide benchmarks across different dimensions:
+- **Vector search scaling** (O(n) vs O(log n))
+- **Real LLM integration** (actual Azure OpenAI calls)
+- **Multi-system comparison** (ToonDB vs ChromaDB, Zep framework ready)
+- **Production-grade framework** (2000+ lines, fully reproducible)
 
 ## Performance Snapshot
 

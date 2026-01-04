@@ -145,7 +145,7 @@ class SyntheticWorkloadGenerator:
             content = content_template.format(
                 issue="login failure",
                 details="I can't access my account since yesterday",
-                action="reset your password",
+                action="trying to upload a large file",
                 followup="Where can I find the reset link?",
                 resolution="I've sent it to your email",
                 product="Enterprise Dashboard",
@@ -155,7 +155,6 @@ class SyntheticWorkloadGenerator:
                 price="$299",
                 discount_info="Volume discounts available",
                 error_code="ERR_TIMEOUT",
-                action="trying to upload a large file",
                 fix_step_1="increase the timeout setting",
                 result_1="still seeing the error",
                 fix_step_2="try splitting the file into smaller chunks",

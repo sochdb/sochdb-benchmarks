@@ -306,10 +306,14 @@ class ToonDBAdapter(MemorySystemAdapter):
         self.db.close()
         db_path = self.config.get("db_path", "/tmp/toondb_benchmark.db")
 
-        # Remove old DB file
+        # Remove old DB file or directory
         import os
+        import shutil
         if os.path.exists(db_path):
-            os.remove(db_path)
+            if os.path.isdir(db_path):
+                shutil.rmtree(db_path)
+            else:
+                os.remove(db_path)
 
         # Recreate
         from toondb import Database, VectorIndex
