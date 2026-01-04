@@ -16,6 +16,40 @@ The goal is to provide a comprehensive view of performance across different work
 | **DuckDB** | ~3,900 vec/s | 0.90 ms | OLAP + VSS | Analytical + Vector Search Hybrid |
 | **NumPy** | N/A | 0.62 ms | In-Memory (Exact) | Baseline comparison |
 
+## Benchmark Run (OpenAI Codex Environment)
+
+**Run Date (UTC)**: 2026-01-04 03:51 UTC  
+**Host**: Linux 6.12.13 (x86_64, KVM)  
+**CPU**: Intel(R) Xeon(R) Platinum 8370C @ 2.80GHz (3 vCPU)  
+**Command**:
+```bash
+TOONDB_LIB_PATH=/root/.pyenv/versions/3.12.12/lib/python3.12/site-packages/toondb/lib/x86_64-unknown-linux-gnu/libtoondb_index.so \
+  python3 benchmarks/comprehensive_benchmark.py
+```
+
+### Standard Benchmark (10K vectors, 128-dim)
+
+| System | Insert (vec/s) | Search (ms avg) | Notes |
+| :--- | ---: | ---: | :--- |
+| NumPy (brute-force) | N/A | 0.359 | Baseline |
+| ChromaDB | 3,925 | 1.548 | — |
+| LanceDB | 18,245 | 14.039 | IVF-PQ index |
+| ToonDB | 2,442 | 0.580 | Rust HNSW via Python FFI |
+
+### Multi-Configuration (ToonDB)
+
+| Config | Insert (vec/s) | Search (ms avg) |
+| :--- | ---: | ---: |
+| 1,000 × 128 | 6,455 | 0.250 |
+| 10,000 × 128 | 2,240 | 0.567 |
+| 10,000 × 384 | 371 | 3.634 |
+| 10,000 × 768 | 1,334 | 1.197 |
+
+### Errors / Limitations
+
+* **SQLite-VSS**: `sqlite3.Connection` in this environment does not expose `enable_load_extension`, so the benchmark could not load the extension.
+* **DuckDB VSS**: Extension download failed (no access to `extensions.duckdb.org` from the container).
+
 ## 🏗️ Systems Engineering Evaluation
 
 Beyond microbenchmarks, we stress-tested ToonDB's "Actual" production capability for Agentic workloads. 
