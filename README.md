@@ -199,6 +199,8 @@ ToonDB                    2377               0.325           1.9x
 
 ## Running the Benchmarks
 
+### Quick Start
+
 1. **Install Dependencies**:
    ```bash
    pip install -r requirements.txt
@@ -215,3 +217,29 @@ ToonDB                    2377               0.325           1.9x
    python3 benchmarks/macro_agent_benchmark.py
    python3 benchmarks/crash_test.py
    ```
+
+### Production-Grade Comparison: ToonDB vs Zep
+
+For a comprehensive, apples-to-apples comparison of agent memory systems:
+
+```bash
+# Set up environment
+export AZURE_OPENAI_API_KEY="your_key"
+export AZURE_OPENAI_ENDPOINT="your_endpoint"
+export TOONDB_LIB_PATH="/path/to/libtoondb_index.so"
+
+# Optional: Add Zep for comparison
+export ZEP_API_URL="http://localhost:8000"
+export ZEP_API_KEY="your_zep_key"
+
+# Run comprehensive benchmark
+python3 benchmarks/run_memory_comparison.py
+```
+
+**What it tests**:
+- Phase 1: Microbenchmarks (latency, throughput)
+- Phase 2: Token efficiency (context assembly)
+- Phase 3: LoCoMo quality (QA accuracy)
+- Phase 4: Scale test (100-2000 observations)
+
+See [`BENCHMARK_FRAMEWORK_GUIDE.md`](BENCHMARK_FRAMEWORK_GUIDE.md) for full details.
