@@ -14,7 +14,6 @@ import io
 import json
 from datetime import datetime
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../toondb-python-sdk/src"))
 
 import numpy as np
 

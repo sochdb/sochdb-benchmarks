@@ -18,7 +18,7 @@ import numpy as np
 
 # Skip all tests if ToonDB library not available
 try:
-    from toondb.vector import VectorIndex, PerformanceWarning
+    from toondb import VectorIndex, PerformanceWarning
     TOONDB_AVAILABLE = True
 except ImportError:
     TOONDB_AVAILABLE = False

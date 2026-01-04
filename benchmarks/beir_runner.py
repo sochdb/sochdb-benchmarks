@@ -29,7 +29,6 @@ from dataclasses import dataclass
 from collections import defaultdict
 
 # Add ToonDB SDK to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../toondb-python-sdk/src"))
 
 
 @dataclass

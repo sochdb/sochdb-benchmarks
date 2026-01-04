@@ -18,7 +18,6 @@ from typing import Dict, List, Tuple
 from dataclasses import dataclass
 import numpy as np
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../toondb-python-sdk/src"))
 
 
 # =============================================================================

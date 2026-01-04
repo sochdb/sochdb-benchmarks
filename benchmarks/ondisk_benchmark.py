@@ -21,7 +21,6 @@ import gc
 from typing import List, Dict, Tuple, Optional
 import numpy as np
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../toondb-python-sdk/src"))
 
 
 # =============================================================================

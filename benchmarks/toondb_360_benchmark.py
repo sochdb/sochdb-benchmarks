@@ -29,7 +29,6 @@ from dataclasses import dataclass, field
 from collections import defaultdict
 import numpy as np
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../toondb-python-sdk/src"))
 
 
 # =============================================================================

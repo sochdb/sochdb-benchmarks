@@ -11,9 +11,7 @@ import os
 import shutil
 import numpy as np
 import sys
-
-# Add ToonDB SDK to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../toondb-python-sdk/src"))
+from toondb import VectorIndex
 
 def generate_vectors(n: int, dim: int, seed: int = 42) -> np.ndarray:
     """Generate random unit vectors"""
@@ -657,9 +655,9 @@ def main():
         speedup = numpy_latency / r['avg_latency']
         print(f"{'ToonDB':<25} {r['insert_rate']:.0f}{'':<10} {r['avg_latency']:.3f}{'':<10} {speedup:.1f}x")
     
-    # Winner announcement
+    # Performance Analysis
     print("\n" + "="*70)
-    print("   🏆 WINNER ANALYSIS")
+    print("   PERFORMANCE ANALYSIS")
     print("="*70)
     
     # Find best performer
@@ -674,24 +672,22 @@ def main():
         # Best search latency (lowest)
         best_search = min(all_systems, key=lambda x: x[1]['avg_latency'])
         
-        print(f"\n  Best Insert: {best_insert[0].upper()} ({best_insert[1]['insert_rate']:.0f} vec/s)")
-        print(f"  Best Search: {best_search[0].upper()} ({best_search[1]['avg_latency']:.3f}ms)")
+        print(f"\n  Highest Insert Rate: {best_insert[0].upper()} ({best_insert[1]['insert_rate']:.0f} vec/s)")
+        print(f"  Lowest Search Latency: {best_search[0].upper()} ({best_search[1]['avg_latency']:.3f}ms)")
         
         if results.get('toondb'):
             t = results['toondb']
-            print(f"\n  ToonDB vs competition:")
+            print(f"\n  Relative Performance (ToonDB baseline):")
             for name, r in all_systems:
                 if name != 'toondb':
                     insert_ratio = t['insert_rate'] / max(r['insert_rate'], 0.001)
                     search_ratio = r['avg_latency'] / max(t['avg_latency'], 0.001)
-                    print(f"    vs {name}: {insert_ratio:.1f}x insert, {search_ratio:.1f}x search")
-            
-            if best_insert[0] == 'toondb' and best_search[0] == 'toondb':
-                print(f"\n  🏆 OVERALL WINNER: ToonDB (faster on BOTH metrics!)")
-            elif best_search[0] == 'toondb':
-                print(f"\n  🏆 OVERALL: ToonDB for search, {best_insert[0]} for insert")
-            else:
-                print(f"\n  🏆 OVERALL: {best_search[0]} for search, {best_insert[0]} for insert")
+                    # "ToonDB is X times faster/slower"
+                    # If ratio > 1, ToonDB is X times faster/more
+                    
+                    insert_str = f"{insert_ratio:.2f}x"
+                    search_str = f"{search_ratio:.2f}x"
+                    print(f"    vs {name:<10}: Insert {insert_str:<8} | Search {search_str:<8} (relative speedup)")
 
 
 # =============================================================================

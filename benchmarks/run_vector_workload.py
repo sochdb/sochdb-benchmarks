@@ -108,7 +108,6 @@ def run_vector_benchmark(
     
     # Import ToonDB
     try:
-        sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent / "toondb-python-sdk/src"))
         from toondb import VectorIndex
         if VectorIndex is None:
             raise ImportError("VectorIndex not available")

@@ -1,0 +1,14 @@
+toondb-client>=0.2.4
+chromadb
+lancedb
+duckdb>=0.9.0
+sqlite-vss
+numpy
+python-dotenv
+requests
+azure-identity
+pandas
+matplotlib
+seaborn
+tqdm
+pyarrow

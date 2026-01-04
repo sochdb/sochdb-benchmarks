@@ -25,7 +25,6 @@ import numpy as np
 import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../toondb-python-sdk/src"))
 
 from dotenv import load_dotenv
 load_dotenv()

@@ -95,7 +95,6 @@ def benchmark_chromadb(vectors: np.ndarray, queries: np.ndarray):
 def benchmark_toondb_vector(vectors: np.ndarray, queries: np.ndarray):
     """Benchmark ToonDB Vector Index (HNSW)"""
     # Add path for development
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../toondb-python-sdk/src"))
     
     try:
         from toondb import VectorIndex

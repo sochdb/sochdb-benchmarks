@@ -24,7 +24,6 @@ from dataclasses import dataclass
 import numpy as np
 import requests
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../toondb-python-sdk/src"))
 
 from dotenv import load_dotenv
 load_dotenv()

@@ -97,7 +97,7 @@ def benchmark_bulk_cli(
     
     # Import here to avoid import errors if bulk not available
     try:
-        from toondb.bulk import bulk_build_index, get_toondb_bulk_path
+        from toondb import bulk_build_index, get_toondb_bulk_path
         # Verify binary exists
         get_toondb_bulk_path()
     except (ImportError, RuntimeError) as e:
@@ -145,7 +145,7 @@ def benchmark_ffi_insert(
     
     # Try to import VectorIndex
     try:
-        from toondb.vector import VectorIndex
+        from toondb import VectorIndex
     except ImportError:
         return BenchResult(
             name=name,

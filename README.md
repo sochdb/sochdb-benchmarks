@@ -1,104 +1,103 @@
-# ToonDB vs SQLite Benchmarks
+# ToonDB Benchmarks
 
-This folder contains benchmarks comparing ToonDB (Embedded WAL & In-Memory) against SQLite (File-based WAL & In-Memory).
+This repository contains reproducible benchmarks comparing **ToonDB** against other vector stores: **ChromaDB**, **LanceDB**, **DuckDB**, and **SQLite (VSS)**.
+
+The goal is to provide a comprehensive view of performance across different workloads: write-heavy, read-heavy, memory-constrained, and on-disk persistence.
+
+## Performance Snapshot
+
+**Scenario**: 10,000 vectors, 128-dimensions, running on local hardware.
+
+| Database | Insert Rate | Search Latency (Avg) | Storage Engine | Primary Use Case |
+| :--- | :--- | :--- | :--- | :--- |
+| **ToonDB** | ~2,377 vec/s | **0.325 ms** | In-Memory (Rust) + WAL | Low-Latency Search, Agent Memory |
+| **LanceDB** | **96,852 vec/s** | 4.07 ms | Disk-Based (Lance) | Large Datasets, High-Throughput Ingestion |
+| **ChromaDB** | ~10,500 vec/s | 0.69 ms | In-Memory / SQLite | General Purpose RAG, Prototyping |
+| **DuckDB** | ~3,900 vec/s | 0.90 ms | OLAP + VSS | Analytical + Vector Search Hybrid |
+| **NumPy** | N/A | 0.62 ms | In-Memory (Exact) | Baseline comparison |
+
+> **Note**: Results measured using `benchmarks/comprehensive_benchmark.py`. See "Run Environment" below for hardware details.
+
+## Why Search Latency Matters More Than Insert
+
+In **Agentic AI** and **RAG** workflows, the performance bottleneck typically lies in the "read" path (retrieval), not the "write" path (ingestion).
+
+1.  **Blocking the Thought Loop**: When an AI Agent "thinks", it queries its memory. This is a blocking operation. Every millisecond of latency delays the agent's next action. ToonDB's **0.3ms** latency keeps the thought loop tight and responsive.
+2.  **Frequency of Operations**: An agent might query its memory dozens of times per turn (e.g., planning, reflecting, tool selection). Ingestion usually happens once (e.g., loading a document) or asynchronously in the background.
+3.  **Real-Time Interaction**: For user-facing chatbots, retrieval latency adds directly to the "Time to First Token". Columnar stores like LanceDB prioritize ingestion speed (good for offline training), but ToonDB prioritizes retrieval speed (critical for online interaction).
+
+**Verdict**: If your app waits for the database to answer before it can reply to the user, optimize for **Search Latency** (ToonDB). If you are batch-processing terabytes of logs overnight, optimize for **Insert Rate** (LanceDB).
+
+## Detailed Comparison
+
+### ToonDB
+- **Performance Profile**: Optimized for low-latency search (0.33ms).
+- **Architecture**: In-memory HNSW index with Rust core.
+- **Trade-off**: Lower ingestion throughput compared to columnar stores.
+
+### LanceDB
+- **Performance Profile**: Optimized for high-throughput ingestion (96k vec/s).
+- **Architecture**: Disk-based columnar format (Lance).
+- **Trade-off**: Higher search latency for random-access patterns (approx. 4ms).
+
+### ChromaDB
+- **Performance Profile**: Balanced performance for general use cases.
+- **Architecture**: Persistent storage with HNSW indexing.
+- **Trade-off**: Slower search than ToonDB, slower ingestion than LanceDB.
+
+## Verification
+
+**Run Environment**:
+- **Hardware**: Mac Studio (Apple M1 Max, 32GB RAM)
+- **OS**: macOS 26.2
+- **Date**: January 03, 2026
+- **Command**: `python3 benchmarks/comprehensive_benchmark.py`
+
+### Raw Output Log (Excerpt)
+
+Below is the output from the strictly verified benchmark run:
+
+```text
+======================================================================
+   FINAL SUMMARY
+======================================================================
+
+System                    Insert (vec/s)     Search (ms)     Speedup vs NumPy
+---------------------------------------------------------------------------
+NumPy (brute-force)       N/A                0.619           1.0x (baseline)
+ChromaDB                  10558              0.687           0.9x
+DuckDB                    3886               0.904           0.7x
+LanceDB                   96852              4.074           0.2x
+ToonDB                    2377               0.325           1.9x
+
+======================================================================
+   PERFORMANCE ANALYSIS
+======================================================================
+
+  Highest Insert Rate: LANCEDB (96852 vec/s)
+  Lowest Search Latency: TOONDB (0.325ms)
+
+  Relative Performance (ToonDB baseline):
+    vs chromadb  : Insert 0.23x    | Search 2.11x    (relative speedup)
+    vs duckdb    : Insert 0.61x    | Search 2.78x    (relative speedup)
+    vs lancedb   : Insert 0.02x    | Search 12.54x   (relative speedup)
+```
 
 ## Running the Benchmarks
 
-```bash
-cargo run --release
-```
+1. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## Results (Latest Run)
+2. **Run Comprehensive Suite**:
+   Runs all DBs against synthetic data (10k-100k vectors).
+   ```bash
+   python3 benchmarks/comprehensive_benchmark.py
+   ```
 
-```
-Benchmarking with 100000 records...
-
-Pre-generating test data (not timed)...
-Test data ready: 100000 records pre-allocated
-
---- SQLite (File) ---
-Insert: 63.41ms
-Insert Rate: 1,577,113 ops/sec
-Read (Scan): 18.17ms (100000 rows)
-Read Rate: 5,502,593 ops/sec
-
---- SQLite (In-Memory) ---
-Insert: 46.09ms
-Insert Rate: 2,169,737 ops/sec
-Read (Scan): 17.26ms (100000 rows)
-Read Rate: 5,794,344 ops/sec
-
---- ToonDB (Embedded WAL) ---
-Insert: 108.20ms
-Insert Rate: 924,217 ops/sec
-Read (Scan): 76.49ms (100000 rows)
-Read Rate: 1,307,437 ops/sec
-
---- ToonDB (In-Memory) ---
-Insert: 60.09ms
-Insert Rate: 1,664,152 ops/sec
-Read (Scan): 85.41ms (100000 rows)
-Read Rate: 1,170,886 ops/sec
-
---- Raw DurableStorage (Isolated) ---
-Insert (100 txns × 1000): 516.89ms
-Insert Rate: 193,466 ops/sec
-
---- ToonDB (put_raw - minimal overhead, single txn) ---
-Insert (1 txn × 100k): 96.44ms
-Insert Rate: 1,036,898 ops/sec
-
---- ToonDB (insert_row_slice - zero alloc) ---
-Insert (100 txns × 1000): 220.36ms
-Insert Rate: 453,793 ops/sec
-Insert (1 txn × 100000): 108.91ms
-Single-txn Rate: 918,170 ops/sec
-
---- ToonDB Fast Mode (no ordered index) ---
-Insert (1 txn × 100000): 76.32ms
-Insert Rate: 1,310,291 ops/sec
-
---- PROFILING: Component Breakdown ---
-Write phase:   61.71ms (  617 ns/op) - 76.4%
-Commit phase:  19.04ms (  190 ns/op) - 23.6%
-Total:         80.75ms (  807 ns/op)
-Throughput:   1,238,427 ops/sec
-
---- No-SkipMap Mode (ordered_index=false) ---
-Write phase:   45.68ms (  457 ns/op) - 72.0%
-Commit phase:  17.74ms (  177 ns/op) - 28.0%
-Total:         63.42ms (  634 ns/op)
-Throughput:   1,576,760 ops/sec
-Speedup:      21.5%
-
---- PROFILING: write_refs() Breakdown ---
-TxnWalBuffer.append():    6.61ms (   66 ns/op)
-DashMap.entry():          4.44ms (   44 ns/op)
-HashSet.insert(clone):    7.30ms (   73 ns/op)
-SkipMap.insert(clone):   13.57ms (  136 ns/op)
-DashMap.insert(clone):   13.61ms (  136 ns/op)
-Vec clone (key+value):    4.68ms (   47 ns/op)
-BloomFilter.insert():     2.40ms (   24 ns/op)
-DirtyList (mutex+push):   2.11ms (   21 ns/op)
-
-Estimated write_refs:    50.05ms (  500 ns/op)
-```
-
-## Analysis
-
-### In-Memory Performance
-- **Insert**: ToonDB (~1.7M ops/sec) is competitive with SQLite (~2.2M ops/sec).
-- **Read**: ToonDB (~1.2M ops/sec) is slower than SQLite (~5.8M ops/sec) due to `HashMap` allocation overhead.
-
-### Durable (WAL) Performance
-- **Insert**:
-    - **Standard API (Embedded WAL)**: ~924k ops/sec.
-    - **Raw API (`put_raw`)**: **~1.04M ops/sec** (Single transaction).
-    - **Fast Mode (No Ordered Index)**: **~1.31M ops/sec** (Single transaction).
-    - **No-SkipMap Profiling**: **~1.58M ops/sec** (Raw storage).
-    - **Comparison**: In "Fast Mode" (disabling the ordered index), ToonDB (~1.31M ops/sec) is now **within 17% of SQLite** (~1.58M ops/sec).
-- **Profiling Insights**:
-    - **Ordered Index Cost**: The `SkipMap` index adds ~136 ns/op (plus cloning overhead). Disabling it yields a **21.5% speedup**.
-    - **Write Phase**: Dominates execution (76.4%).
-    - **Commit Phase**: Very fast (190 ns/op) thanks to buffered writes (O(1) lock).
-    - **Bottlenecks**: `SkipMap` insertion and `DashMap` insertion are the primary costs.
+3. **Real-World Embedding Test**:
+   Requires Azure OpenAI keys in `.env`. Benchmarks end-to-end latency.
+   ```bash
+   python3 benchmarks/real_embedding_benchmark.py
+   ```
