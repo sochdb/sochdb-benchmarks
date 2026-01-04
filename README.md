@@ -1,8 +1,16 @@
 # ToonDB Benchmarks
 
-This repository contains reproducible benchmarks comparing **ToonDB** against other vector stores: **ChromaDB**, **LanceDB**, **DuckDB**, and **SQLite (VSS)**.
+This repository contains reproducible benchmarks comparing **ToonDB** against other vector stores and agent memory systems.
 
-The goal is to provide a comprehensive view of performance across different workloads: write-heavy, read-heavy, memory-constrained, and on-disk persistence.
+**📊 [See Published Results](PUBLISHED_RESULTS.md)** - Comprehensive benchmark findings with real LLM integration
+
+## Overview
+
+We provide benchmarks across different dimensions:
+- **Vector search scaling** (O(n) vs O(log n))
+- **Real LLM integration** (actual Azure OpenAI calls)
+- **Multi-system comparison** (ToonDB vs ChromaDB, Zep framework ready)
+- **Production-grade framework** (2000+ lines, fully reproducible)
 
 ## Performance Snapshot
 
@@ -199,6 +207,8 @@ ToonDB                    2377               0.325           1.9x
 
 ## Running the Benchmarks
 
+### Quick Start
+
 1. **Install Dependencies**:
    ```bash
    pip install -r requirements.txt
@@ -215,3 +225,29 @@ ToonDB                    2377               0.325           1.9x
    python3 benchmarks/macro_agent_benchmark.py
    python3 benchmarks/crash_test.py
    ```
+
+### Production-Grade Comparison: ToonDB vs Zep
+
+For a comprehensive, apples-to-apples comparison of agent memory systems:
+
+```bash
+# Set up environment
+export AZURE_OPENAI_API_KEY="your_key"
+export AZURE_OPENAI_ENDPOINT="your_endpoint"
+export TOONDB_LIB_PATH="/path/to/libtoondb_index.so"
+
+# Optional: Add Zep for comparison
+export ZEP_API_URL="http://localhost:8000"
+export ZEP_API_KEY="your_zep_key"
+
+# Run comprehensive benchmark
+python3 benchmarks/run_memory_comparison.py
+```
+
+**What it tests**:
+- Phase 1: Microbenchmarks (latency, throughput)
+- Phase 2: Token efficiency (context assembly)
+- Phase 3: LoCoMo quality (QA accuracy)
+- Phase 4: Scale test (100-2000 observations)
+
+See [`BENCHMARK_FRAMEWORK_GUIDE.md`](BENCHMARK_FRAMEWORK_GUIDE.md) for full details.
