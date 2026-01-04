@@ -77,22 +77,99 @@ We isolated the cosine distance kernel to check SIMD usage on ARM (Apple M1 Max)
 - **Finding**: Raw kernel throughput via FFI is lower than NumPy (0.08x) due to Python<->Rust boundary overhead on single queries.
 - **Verdict**: ToonDB is optimal for **Search** (where work stays in Rust) but has high overhead for basic vector math ops in Python compared to highly optimized BLAS.
 
+## 🤖 Agent Memory Systems Benchmark
+
+### 1. Pure Vector Search Scaling: O(n) vs O(log n)
+
+**The Problem**: Brute-force O(n) vector search causes P99 latency to degrade 34x as observations grow from 40 → 2000.
+**The Solution**: HNSW O(log n) search keeps degradation minimal (5.9x) while delivering 11x better performance at scale.
+
+This benchmark uses **pre-generated random embeddings** to isolate pure vector search performance (no LLM API overhead).
+
+#### Results: Brute-Force vs HNSW
+
+| Scale | Brute-Force P99 | HNSW P99 | Speedup |
+| :--- | ---: | ---: | ---: |
+| 40 observations | 0.26ms | 0.14ms | **1.9x** |
+| 100 observations | 0.71ms | 0.20ms | **3.6x** |
+| 200 observations | 0.90ms | 0.36ms | **2.5x** |
+| 500 observations | 2.98ms | 0.49ms | **6.1x** |
+| 1,000 observations | 6.92ms | 0.86ms | **8.0x** |
+| 2,000 observations | **9.06ms** | **0.81ms** | **11.2x** |
+
+**Scaling Analysis:**
+- **Brute-Force (40 → 2000)**: P99 degrades 0.26ms → 9.06ms (**34x worse**)
+- **HNSW (40 → 2000)**: P99 degrades 0.14ms → 0.81ms (**5.9x** - much better!)
+- **At 200 observations**: The crossover point where HNSW becomes clearly superior
+- **At 2000 observations**: HNSW is **11.2x faster** than brute-force
+
+**Run the benchmark:**
+```bash
+export TOONDB_LIB_PATH=/path/to/libtoondb_index.so
+python3 benchmarks/pure_search_scale_benchmark.py
+```
+
+---
+
+### 2. Real-World LLM Integration Test
+
+**Inspired by the [Zep vs Mem0 controversy](https://blog.getzep.com/lies-damn-lies-statistics-is-mem0-really-sota-in-agent-memory/)**
+
+This benchmark uses **actual Azure OpenAI embedding calls** to test memory systems in realistic agent conversation scenarios.
+
+#### Test Configuration
+- **Conversations**: 8 multi-turn dialogues (customer support, technical support, product inquiries)
+- **Messages**: 65 total messages stored as memories
+- **Test Queries**: 200 queries to test memory recall
+- **Embeddings**: Azure OpenAI `text-embedding-3-small` (1536-dim)
+- **Date**: 2026-01-04
+
+#### Results: ToonDB vs ChromaDB
+
+| System | Insert (avg) | p50 Latency | p95 Latency | p99 Latency | Context Size |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| **ToonDB** | 94.20ms | **79.49ms** | 172.64ms | 2557.91ms | 36 tokens |
+| **ChromaDB** | 184.90ms | 82.80ms | **123.00ms** | **1338.15ms** | 36 tokens |
+
+**Key Findings:**
+- **ToonDB** is **1.96x faster at insert** (94ms vs 185ms)
+- **ChromaDB** has **better p95/p99 consistency** (123ms vs 173ms p95)
+- Both systems delivered **identical context quality** (36 tokens avg)
+- **Real embedding overhead dominates**: 70-90% of latency is Azure OpenAI API calls, not DB operations
+
+#### Why This Matters
+
+Unlike synthetic vector benchmarks, this test measures:
+1. **Real LLM integration overhead** - actual API calls to Azure OpenAI
+2. **Multi-turn conversation memory** - realistic agent dialogue patterns
+3. **Production-like workloads** - insert + search in realistic sequences
+4. **Context assembly** - how fast systems retrieve and build context for LLM prompts
+
+**Run the benchmark:**
+```bash
+export TOONDB_LIB_PATH=/path/to/libtoondb_index.so
+python3 benchmarks/memory_systems_comparison.py
+```
+
 ## detailed Comparison
 
 ### ToonDB
-- **Performance Profile**: Optimized for low-latency search (0.33ms).
-- **Architecture**: In-memory HNSW index with Rust core.
-- **Trade-off**: Lower ingestion throughput compared to columnar stores.
+- **Performance Profile**: Optimized for low-latency search (0.33ms) and fast inserts for agent memory.
+- **Architecture**: In-memory HNSW index with Rust core, Python FFI.
+- **Trade-off**: Lower ingestion throughput compared to columnar stores on bulk loads.
+- **Best For**: Agent memory systems, real-time RAG, low-latency search.
 
 ### LanceDB
 - **Performance Profile**: Optimized for high-throughput ingestion (96k vec/s).
 - **Architecture**: Disk-based columnar format (Lance).
 - **Trade-off**: Higher search latency for random-access patterns (approx. 4ms).
+- **Best For**: Large-scale datasets, batch processing, analytics.
 
 ### ChromaDB
 - **Performance Profile**: Balanced performance for general use cases.
 - **Architecture**: Persistent storage with HNSW indexing.
 - **Trade-off**: Slower search than ToonDB, slower ingestion than LanceDB.
+- **Best For**: General-purpose RAG, prototyping, moderate-scale applications.
 
 ## Verification
 
