@@ -1,0 +1,11 @@
+[
+  {
+    "system": "ToonDB",
+    "avg_insert_latency_ms": 166.24546246601852,
+    "p95_search_latency_ms": 2946.055389699984,
+    "avg_search_latency_ms": 317.9763101399959,
+    "avg_recall_score": 1.0,
+    "avg_context_tokens": 47.81,
+    "total_memories": 206
+  }
+]
