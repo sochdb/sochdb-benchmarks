@@ -1,0 +1,22 @@
+[
+  {
+    "system": "ToonDB",
+    "insert_avg_ms": 152.44438076923072,
+    "search_p50_ms": 121.2814590000022,
+    "search_p95_ms": 260.52100000000064,
+    "search_p99_ms": 486.8890409999995,
+    "search_avg_ms": 139.45776874500024,
+    "context_avg_tokens": 36.155,
+    "recall_avg": 0.0
+  },
+  {
+    "system": "ChromaDB",
+    "insert_avg_ms": 183.18679363076924,
+    "search_p50_ms": 123.92620800000032,
+    "search_p95_ms": 470.9173750000133,
+    "search_p99_ms": 923.9444590000119,
+    "search_avg_ms": 175.38882438,
+    "context_avg_tokens": 36.155,
+    "recall_avg": 0.0
+  }
+]

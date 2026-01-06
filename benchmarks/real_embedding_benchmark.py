@@ -81,10 +81,10 @@ class EmbeddingClient:
     """Azure OpenAI embedding client with metrics."""
     
     def __init__(self):
-        self.endpoint = os.getenv("AZURE_EMEBEDDING_ENDPOINT")
-        self.key = os.getenv("AZURE_EMEBEDDING_API_KEY")
-        self.deployment = os.getenv("AZURE_EMEBEDDING_DEPLOYMENT_NAME", "embedding")
-        self.version = os.getenv("AZURE_EMEBEDDING_API_VERSION", "2024-12-01-preview")
+        self.endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+        self.key = os.getenv("AZURE_OPENAI_API_KEY")
+        self.deployment = os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT", "embedding")
+        self.version = os.getenv("AZURE_OPENAI_API_VERSION", "2024-12-01-preview")
         self.dimension = 1536
         self.metrics = EmbeddingMetrics()
     
