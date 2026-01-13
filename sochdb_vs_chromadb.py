@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Head-to-Head: ToonDB-Index vs ChromaDB
+Head-to-Head: SochDB-Index vs ChromaDB
 Vector Database Benchmark
 
-Run with: python3 benchmarks/toondb_vs_chromadb.py
+Run with: python3 benchmarks/sochdb_vs_chromadb.py
 """
 
 import time
@@ -13,7 +13,7 @@ import subprocess
 import numpy as np
 
 # Configuration
-DIM = 128  # Match ToonDB-Index benchmark dimension
+DIM = 128  # Match SochDB-Index benchmark dimension
 NUM_VECTORS = 10_000
 NUM_QUERIES = 100
 TOP_K = 10
@@ -128,37 +128,37 @@ def benchmark_numpy(vectors: np.ndarray, queries: np.ndarray):
         "qps": qps
     }
 
-def run_toondb_hnsw():
-    """Run ToonDB HNSW test"""
+def run_sochdb_hnsw():
+    """Run SochDB HNSW test"""
     print("\n" + "="*60)
-    print("ToonDB-Index (Rust + HNSW)")
+    print("SochDB-Index (Rust + HNSW)")
     print("="*60)
     
     # Run a quick Rust test that prints results
     result = subprocess.run(
-        ["cargo", "test", "-p", "toondb-index", "--release", 
+        ["cargo", "test", "-p", "sochdb-index", "--release", 
          "--", "--nocapture", "test_hnsw_perf"],
         capture_output=True,
         text=True,
-        cwd="/Users/sushanth/toondb"
+        cwd="/Users/sushanth/sochdb"
     )
     
     if result.returncode == 0:
         # Parse output for perf numbers
         print(result.stdout)
-        print("(ToonDB uses compiled Rust - much faster than Python)")
+        print("(SochDB uses compiled Rust - much faster than Python)")
     else:
-        print("ToonDB HNSW test not available, showing estimated performance:")
+        print("SochDB HNSW test not available, showing estimated performance:")
         print("  Insert: ~50,000-100,000 vec/sec (Rust compiled)")
         print("  Search: ~0.1-0.5ms per query (with 10K vectors)")
         print("  QPS: ~2,000-10,000")
-        print("\nNote: Run 'cargo bench -p toondb-index' for detailed metrics")
+        print("\nNote: Run 'cargo bench -p sochdb-index' for detailed metrics")
     
     return None
 
 def main():
     print("="*60)
-    print("   HEAD-TO-HEAD: ToonDB-Index vs ChromaDB")
+    print("   HEAD-TO-HEAD: SochDB-Index vs ChromaDB")
     print("="*60)
     print(f"\nConfig: {NUM_VECTORS} vectors, {DIM}-dim, {NUM_QUERIES} queries, top-{TOP_K}")
     
@@ -175,8 +175,8 @@ def main():
     # ChromaDB
     results['chromadb'] = benchmark_chromadb(vectors, queries)
     
-    # ToonDB
-    run_toondb_hnsw()
+    # SochDB
+    run_sochdb_hnsw()
     
     # Summary
     print("\n" + "="*60)
@@ -193,9 +193,9 @@ def main():
         r = results['chromadb']
         print(f"{'ChromaDB (HNSW)':<25} {r['insert_rate']:.0f}{'':<12} {r['avg_latency']:.2f}ms{'':<8} {r['qps']:.0f}")
     
-    print(f"{'ToonDB-Index (HNSW)':<25} {'~50-100K*':<18} {'~0.1-0.5ms*':<15} {'~2000-10K*'}")
-    print("\n* ToonDB numbers are estimated from Rust benchmarks")
-    print("  Run 'cargo bench -p toondb-index' for exact measurements")
+    print(f"{'SochDB-Index (HNSW)':<25} {'~50-100K*':<18} {'~0.1-0.5ms*':<15} {'~2000-10K*'}")
+    print("\n* SochDB numbers are estimated from Rust benchmarks")
+    print("  Run 'cargo bench -p sochdb-index' for exact measurements")
     
     print("\n" + "="*60)
     print("   KEY INSIGHTS")
@@ -205,12 +205,12 @@ def main():
 • ChromaDB Insert: {results['chromadb']['insert_rate']:.0f} vec/sec
 • ChromaDB Search: {results['chromadb']['avg_latency']:.2f}ms @ {results['chromadb']['qps']:.0f} QPS
 
-• ToonDB-Index (estimated from Rust benchmarks):
+• SochDB-Index (estimated from Rust benchmarks):
   - Insert: 50K-100K vec/sec (30-60x faster than ChromaDB)
   - Search: ~0.1-0.5ms (~5-10x faster than ChromaDB)
   - Advantage: Native Rust, no Python overhead, SIMD optimized
 
-• Why ToonDB is faster:
+• Why SochDB is faster:
   1. Rust vs Python: No GIL, zero-copy operations
   2. SIMD kernels: AVX2/NEON for distance calculations
   3. Memory layout: Cache-friendly data structures

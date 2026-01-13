@@ -1,7 +1,7 @@
 
 ======================================================================
   MEMORY SYSTEMS BENCHMARK RESULTS
-  ToonDB vs ChromaDB
+  SochDB vs ChromaDB
   Date: 2026-01-06
 ======================================================================
 
@@ -17,19 +17,19 @@
 
 | System | Insert (avg) | p50 Latency | p95 Latency | p99 Latency | Context Size |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| **ToonDB** | **152.44ms** | **121.28ms** | **260.52ms** | **486.89ms** | 36 tokens |
+| **SochDB** | **152.44ms** | **121.28ms** | **260.52ms** | **486.89ms** | 36 tokens |
 | **ChromaDB** | 183.19ms | 123.93ms | 470.92ms | 923.94ms | 36 tokens |
 
 3. KEY FINDINGS
 ---------------
-- **Insert**: ToonDB is ~1.2x faster (152ms vs 183ms).
+- **Insert**: SochDB is ~1.2x faster (152ms vs 183ms).
 - **Search Latency**:
   - p50 is similar (~121ms vs ~124ms).
-  - ToonDB is significantly faster at p95 (260ms vs 471ms) and p99 (487ms vs 924ms).
-  - This indicates ToonDB has much more consistent tail latency.
+  - SochDB is significantly faster at p95 (260ms vs 471ms) and p99 (487ms vs 924ms).
+  - This indicates SochDB has much more consistent tail latency.
 - **Context**: Identical context retrieved (36 tokens avg).
 
 4. NOTES
 --------
 - The high baseline latency (>100ms) for both is due to the Azure OpenAI Embedding API calls.
-- The difference in tail latency (p95/p99) highlights ToonDB's efficiency in handling vector search operations compared to ChromaDB under the same load.
+- The difference in tail latency (p95/p99) highlights SochDB's efficiency in handling vector search operations compared to ChromaDB under the same load.

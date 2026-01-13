@@ -62,7 +62,7 @@ class HNSWSearch:
     """HNSW O(log n) vector search"""
 
     def __init__(self, dimension: int = 1536):
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
 
         self.dimension = dimension
         self.index = VectorIndex(

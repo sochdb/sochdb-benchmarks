@@ -1,8 +1,8 @@
 """
-ToonDB Memory Adapter
+SochDB Memory Adapter
 ====================
 
-Implements the memory system interface for ToonDB.
+Implements the memory system interface for SochDB.
 
 Uses:
 - Context Query for context assembly within token budget
@@ -25,16 +25,16 @@ from memory_benchmark_harness import (
 )
 
 
-class ToonDBAdapter(MemorySystemAdapter):
-    """ToonDB implementation of memory system interface"""
+class SochDBAdapter(MemorySystemAdapter):
+    """SochDB implementation of memory system interface"""
 
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
 
-        from toondb import Database, VectorIndex
+        from sochdb import Database, VectorIndex
 
-        # Initialize ToonDB database
-        db_path = config.get("db_path", "/tmp/toondb_benchmark.db")
+        # Initialize SochDB database
+        db_path = config.get("db_path", "/tmp/sochdb_benchmark.db")
         self.db = Database.open(db_path)
 
         # Initialize HNSW index for vector search
@@ -79,7 +79,7 @@ class ToonDBAdapter(MemorySystemAdapter):
         session_id: str,
         messages: List[Message]
     ) -> float:
-        """Ingest messages into ToonDB"""
+        """Ingest messages into SochDB"""
         start = time.perf_counter()
 
         for i, msg in enumerate(messages):
@@ -126,7 +126,7 @@ class ToonDBAdapter(MemorySystemAdapter):
         tenant_id: str,
         docs: List[Document]
     ) -> float:
-        """Ingest documents into ToonDB"""
+        """Ingest documents into SochDB"""
         start = time.perf_counter()
 
         for i, doc in enumerate(docs):
@@ -173,7 +173,7 @@ class ToonDBAdapter(MemorySystemAdapter):
         token_budget: int
     ) -> ContextResult:
         """
-        Retrieve context using ToonDB's HNSW search + token-aware assembly.
+        Retrieve context using SochDB's HNSW search + token-aware assembly.
 
         Strategy:
         1. Embed query
@@ -304,7 +304,7 @@ class ToonDBAdapter(MemorySystemAdapter):
         """Reset all data"""
         # Close and reopen DB (clears in-memory state)
         self.db.close()
-        db_path = self.config.get("db_path", "/tmp/toondb_benchmark.db")
+        db_path = self.config.get("db_path", "/tmp/sochdb_benchmark.db")
 
         # Remove old DB file or directory
         import os
@@ -316,7 +316,7 @@ class ToonDBAdapter(MemorySystemAdapter):
                 os.remove(db_path)
 
         # Recreate
-        from toondb import Database, VectorIndex
+        from sochdb import Database, VectorIndex
         self.db = Database.open(db_path)
 
         # Reset HNSW index

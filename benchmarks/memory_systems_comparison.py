@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Memory Systems Head-to-Head: ToonDB vs Zep vs Mem0
+Memory Systems Head-to-Head: SochDB vs Zep vs Mem0
 
 Real-world agent memory benchmark inspired by the Zep vs Mem0 controversy.
 This benchmark uses actual LLM calls to test memory quality, latency, and efficiency.
@@ -195,11 +195,11 @@ class BenchmarkQueries:
 # Memory System Implementations
 # =============================================================================
 
-class ToonDBMemory:
-    """ToonDB-based agent memory."""
+class SochDBMemory:
+    """SochDB-based agent memory."""
 
     def __init__(self, client: AzureOpenAI, config: Config):
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         self.client = client
         self.config = config
         self.index = VectorIndex(dimension=config.embedding_dim, max_connections=32, ef_construction=200)
@@ -422,7 +422,7 @@ class MemorySystemBenchmark:
         """Run all benchmarks."""
         print("="*70)
         print("  MEMORY SYSTEMS HEAD-TO-HEAD BENCHMARK")
-        print("  ToonDB vs ChromaDB")
+        print("  SochDB vs ChromaDB")
         print("  (Inspired by the Zep vs Mem0 Controversy)")
         print("="*70)
         print(f"\n  Test Configuration:")
@@ -433,10 +433,10 @@ class MemorySystemBenchmark:
 
         all_results = []
 
-        # ToonDB
-        toondb = ToonDBMemory(self.client, self.config)
-        toondb_results = self.run_benchmark(toondb, "ToonDB")
-        all_results.append(toondb_results.get_stats())
+        # SochDB
+        sochdb = SochDBMemory(self.client, self.config)
+        sochdb_results = self.run_benchmark(sochdb, "SochDB")
+        all_results.append(sochdb_results.get_stats())
 
         # ChromaDB
         chromadb = ChromaDBMemory(self.client, self.config)
@@ -471,15 +471,15 @@ class MemorySystemBenchmark:
         # Performance comparison
         if len(results) >= 2:
             print(f"\n{'='*70}")
-            print("  PERFORMANCE vs ToonDB")
+            print("  PERFORMANCE vs SochDB")
             print(f"{'='*70}")
 
-            toondb = next((r for r in results if r['system'] == 'ToonDB'), None)
-            if toondb:
+            sochdb = next((r for r in results if r['system'] == 'SochDB'), None)
+            if sochdb:
                 for r in results:
-                    if r['system'] != 'ToonDB':
-                        speedup_p95 = r['search_p95_ms'] / toondb['search_p95_ms']
-                        token_ratio = r['context_avg_tokens'] / toondb['context_avg_tokens'] if toondb['context_avg_tokens'] > 0 else 1.0
+                    if r['system'] != 'SochDB':
+                        speedup_p95 = r['search_p95_ms'] / sochdb['search_p95_ms']
+                        token_ratio = r['context_avg_tokens'] / sochdb['context_avg_tokens'] if sochdb['context_avg_tokens'] > 0 else 1.0
 
                         print(f"\n  {r['system']}:")
                         if speedup_p95 > 1:

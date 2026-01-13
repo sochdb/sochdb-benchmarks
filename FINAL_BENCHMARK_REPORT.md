@@ -1,4 +1,4 @@
-# ToonDB Final Benchmark Report
+# SochDB Final Benchmark Report
 
 Generated: 2025-12-28 12:13:30
 
@@ -15,7 +15,7 @@ Generated: 2025-12-28 12:13:30
 |-----------|--------|------|
 | Full Benchmark Suite | ✓ PASS | 58.8s |
 | Reproduce HNSW Bug | ✓ PASS | 1.2s |
-| ToonDB vs ChromaDB | ✓ PASS | 52.5s |
+| SochDB vs ChromaDB | ✓ PASS | 52.5s |
 | Vector DB Benchmark | ✓ PASS | 8.7s |
 
 ## Example Scripts
@@ -42,7 +42,7 @@ Based on the benchmark results:
 
 1. **Correctness**: HNSW retrieval is working correctly with 98%+ Recall@10
 2. **Performance**: Search latency is excellent (<1ms), insert throughput needs optimization
-3. **Comparison**: ToonDB is 1.2-1.3x faster than ChromaDB on search
+3. **Comparison**: SochDB is 1.2-1.3x faster than ChromaDB on search
 
 ### Priority Fixes
 

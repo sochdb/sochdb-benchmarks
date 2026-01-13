@@ -90,7 +90,7 @@
     "qps": 2941.600770544076
   },
   "vs_chromadb": {
-    "toondb": {
+    "sochdb": {
       "insert_time": 1.8076620840000004,
       "insert_rate": 2766.0036929778294,
       "search_p50_ms": 0.25614549999986025

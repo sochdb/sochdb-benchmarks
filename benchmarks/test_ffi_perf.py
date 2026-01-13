@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB FFI Performance Regression Tests
+SochDB FFI Performance Regression Tests
 
 Cross-language performance verification suite that ensures:
 1. FFI throughput stays above documented thresholds
@@ -16,12 +16,12 @@ import warnings
 import pytest
 import numpy as np
 
-# Skip all tests if ToonDB library not available
+# Skip all tests if SochDB library not available
 try:
-    from toondb import VectorIndex, PerformanceWarning
-    TOONDB_AVAILABLE = True
+    from sochdb import VectorIndex, PerformanceWarning
+    SOCHDB_AVAILABLE = True
 except ImportError:
-    TOONDB_AVAILABLE = False
+    SOCHDB_AVAILABLE = False
 
 # Performance thresholds (vec/sec)
 # These are conservative minimums - actual performance should be higher
@@ -60,15 +60,15 @@ def vectors_128d_small():
     return np.random.randn(1000, 128).astype(np.float32)
 
 
-@pytest.mark.skipif(not TOONDB_AVAILABLE, reason="ToonDB library not available")
+@pytest.mark.skipif(not SOCHDB_AVAILABLE, reason="SochDB library not available")
 class TestFFIPerformance:
     """Performance regression tests for FFI throughput."""
     
     def test_no_safe_mode(self):
-        """Verify TOONDB_BATCH_SAFE_MODE is not set during tests."""
-        safe_mode = os.environ.get("TOONDB_BATCH_SAFE_MODE")
+        """Verify SOCHDB_BATCH_SAFE_MODE is not set during tests."""
+        safe_mode = os.environ.get("SOCHDB_BATCH_SAFE_MODE")
         assert safe_mode not in ("1", "true", "True"), (
-            "TOONDB_BATCH_SAFE_MODE is enabled! "
+            "SOCHDB_BATCH_SAFE_MODE is enabled! "
             "Performance tests are invalid. Unset this variable."
         )
     
@@ -196,7 +196,7 @@ class TestFFIPerformance:
         )
 
 
-@pytest.mark.skipif(not TOONDB_AVAILABLE, reason="ToonDB library not available")
+@pytest.mark.skipif(not SOCHDB_AVAILABLE, reason="SochDB library not available")
 class TestFFICorrectness:
     """Correctness tests for FFI insert paths."""
     

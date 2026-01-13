@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Vector Workload Runner for ToonDB
+Vector Workload Runner for SochDB
 
-Runs vector search benchmarks using actual ToonDB VectorIndex.
+Runs vector search benchmarks using actual SochDB VectorIndex.
 Measures insert throughput, search QPS, latency percentiles, and recall@k.
 """
 
@@ -104,16 +104,16 @@ def run_vector_benchmark(
     ground_truth: Optional[dict],
     config: dict
 ) -> dict:
-    """Run the vector benchmark using ToonDB VectorIndex."""
+    """Run the vector benchmark using SochDB VectorIndex."""
     
-    # Import ToonDB
+    # Import SochDB
     try:
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         if VectorIndex is None:
             raise ImportError("VectorIndex not available")
     except ImportError as e:
-        print(f"Error: Could not import ToonDB VectorIndex: {e}")
-        print("Make sure TOONDB_LIB_PATH is set to the directory containing libtoondb_index")
+        print(f"Error: Could not import SochDB VectorIndex: {e}")
+        print("Make sure SOCHDB_LIB_PATH is set to the directory containing libsochdb_index")
         sys.exit(1)
     
     dimension = embeddings.shape[1]
@@ -127,7 +127,7 @@ def run_vector_benchmark(
     k = config.get("k", 10)
     batch_size = config.get("batch_size", 1000)
     
-    print(f"\n=== ToonDB Vector Benchmark ===")
+    print(f"\n=== SochDB Vector Benchmark ===")
     print(f"Vectors: {num_vectors:,} @ {dimension}-dim")
     print(f"Queries: {num_queries:,}")
     print(f"HNSW: M={M}, ef_construction={ef_construction}, ef_search={ef_search}")
@@ -202,7 +202,7 @@ def run_vector_benchmark(
     
     # Compile results
     results = {
-        "workload": "toondb_vector",
+        "workload": "sochdb_vector",
         "timestamp": datetime.now().isoformat(),
         "config": {
             "num_vectors": num_vectors,
@@ -277,7 +277,7 @@ def print_summary(results: dict):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="ToonDB Vector Workload Runner")
+    parser = argparse.ArgumentParser(description="SochDB Vector Workload Runner")
     parser.add_argument("--dataset", "-d", help="Dataset directory")
     parser.add_argument("--vectors", "-n", type=int, default=10000, help="Number of vectors (if no dataset)")
     parser.add_argument("--dim", type=int, default=128, help="Dimension (if no dataset)")

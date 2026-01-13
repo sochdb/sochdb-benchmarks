@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-ToonDB HNSW Bug Reproduction Script
+SochDB HNSW Bug Reproduction Script
 
-This script demonstrates a critical retrieval bug in ToonDB's HNSW implementation.
+This script demonstrates a critical retrieval bug in SochDB's HNSW implementation.
 
 EXPECTED BEHAVIOR:
 - When querying for an exact vector that was just inserted, it should be returned
@@ -13,11 +13,11 @@ ACTUAL BEHAVIOR:
 - Completely different vectors are returned with high distances (0.8+)
 
 STEPS TO REPRODUCE:
-1. Build ToonDB in release mode:
-   cd /Users/sushanth/toondb && cargo build --release
+1. Build SochDB in release mode:
+   cd /Users/sushanth/sochdb && cargo build --release
 
 2. Run this script:
-   PYTHONPATH=toondb-python-sdk/src TOONDB_LIB_PATH=target/release python3 benchmarks/reproduce_hnsw_bug.py
+   PYTHONPATH=sochdb-python-sdk/src SOCHDB_LIB_PATH=target/release python3 benchmarks/reproduce_hnsw_bug.py
 
 INDUSTRY STANDARD:
 - HNSW should achieve >95% Recall@10 on random vectors
@@ -29,7 +29,7 @@ import sys
 import numpy as np
 
 
-from toondb import VectorIndex
+from sochdb import VectorIndex
 
 
 def test_self_retrieval():
@@ -103,7 +103,7 @@ def test_recall_at_k():
     print(f"\n  Inserting {num_vectors} vectors...")
     index.insert_batch(ids, vectors)
     
-    # Compute ground truth using cosine distance (ToonDB's default)
+    # Compute ground truth using cosine distance (SochDB's default)
     print("  Computing ground truth (brute-force cosine)...")
     
     # Normalize for cosine
@@ -147,9 +147,9 @@ def test_recall_at_k():
 
 def main():
     print("=" * 70)
-    print("  TOONDB HNSW BUG REPRODUCTION")
+    print("  SOCHDB HNSW BUG REPRODUCTION")
     print("=" * 70)
-    print("\n  This script demonstrates retrieval issues in ToonDB's HNSW.")
+    print("\n  This script demonstrates retrieval issues in SochDB's HNSW.")
     
     test1_pass = test_self_retrieval()
     test2_pass = test_recall_at_k()
@@ -161,7 +161,7 @@ def main():
     print(f"  Test 2 (Recall@10):      {'✓ PASS' if test2_pass else '❌ FAIL'}")
     
     if not test1_pass or not test2_pass:
-        print("\n  ⚠️  CRITICAL: ToonDB HNSW has retrieval correctness issues!")
+        print("\n  ⚠️  CRITICAL: SochDB HNSW has retrieval correctness issues!")
         print("     The index is fast but returns WRONG results.")
         print("\n  Expected: Both tests should PASS")
         print("  Actual: One or more tests FAILED")

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-ToonDB Recall Benchmark: Measures search quality with real embeddings
+SochDB Recall Benchmark: Measures search quality with real embeddings
 
-This benchmark computes recall@k by comparing ToonDB's HNSW approximate search
+This benchmark computes recall@k by comparing SochDB's HNSW approximate search
 against brute-force exact search (ground truth).
 
 Usage:
     source .venv312/bin/activate
-    TOONDB_LIB_PATH=target/release python3 benchmarks/recall_benchmark.py
+    SOCHDB_LIB_PATH=target/release python3 benchmarks/recall_benchmark.py
 """
 
 import os
@@ -145,14 +145,14 @@ def generate_documents(count: int) -> List[str]:
 
 
 # =============================================================================
-# ToonDB Adapter
+# SochDB Adapter
 # =============================================================================
 
-class ToonDBRecallBenchmark:
-    """ToonDB benchmark with different HNSW configurations."""
+class SochDBRecallBenchmark:
+    """SochDB benchmark with different HNSW configurations."""
     
     def __init__(self, dimension: int, m: int = 16, ef_construction: int = 100):
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         self.m = m
         self.ef_construction = ef_construction
         self.index = VectorIndex(
@@ -182,7 +182,7 @@ class ToonDBRecallBenchmark:
 
 def main():
     print("="*70)
-    print("  TOONDB RECALL BENCHMARK")
+    print("  SOCHDB RECALL BENCHMARK")
     print("  Measuring Search Quality with Real Embeddings")
     print("="*70)
     
@@ -225,7 +225,7 @@ def main():
     print(f"   ✓ Computed top-{max_k} ground truth for {len(queries)} queries")
     
     # Benchmark each configuration
-    print(f"\n5. Benchmarking ToonDB with different HNSW configurations...")
+    print(f"\n5. Benchmarking SochDB with different HNSW configurations...")
     print("-"*70)
     
     all_results = []
@@ -234,7 +234,7 @@ def main():
         print(f"\n   Configuration: M={config['m']}, ef_construction={config['ef_construction']}")
         
         # Create index
-        index = ToonDBRecallBenchmark(
+        index = SochDBRecallBenchmark(
             dimension=embed_client.dimension,
             m=config["m"],
             ef_construction=config["ef_construction"]

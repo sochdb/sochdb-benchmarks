@@ -1,8 +1,8 @@
-# ToonDB vs Zep: Production-Grade Benchmark Framework
+# SochDB vs Zep: Production-Grade Benchmark Framework
 
 ## Overview
 
-This is a comprehensive, **apples-to-apples** benchmark framework for comparing agent memory systems (ToonDB vs Zep).
+This is a comprehensive, **apples-to-apples** benchmark framework for comparing agent memory systems (SochDB vs Zep).
 
 Unlike previous benchmarks that used synthetic vectors, this framework:
 - ✅ Uses the **same interface** for both systems
@@ -111,7 +111,7 @@ benchmarks/
 │   └── BenchmarkMetrics                 # Metrics collection
 │
 ├── adapters/
-│   ├── toondb_adapter.py                # ToonDB implementation
+│   ├── sochdb_adapter.py                # SochDB implementation
 │   │   ├── HNSW index (O(log n))
 │   │   ├── Hierarchical storage
 │   │   └── Token-aware assembly
@@ -137,7 +137,7 @@ benchmarks/
 
 ## Expected Performance Characteristics
 
-### ToonDB
+### SochDB
 
 **Strengths**:
 - **Low latency**: HNSW O(log n) search should deliver p95 < 100ms at scale
@@ -184,13 +184,13 @@ To ensure nobody can dispute results:
 
 ```bash
 # Install dependencies
-pip install toondb-client zep-python openai tiktoken numpy
+pip install sochdb zep-python openai tiktoken numpy
 
 # Set environment variables
 export AZURE_OPENAI_API_KEY="your_key"
 export AZURE_OPENAI_ENDPOINT="your_endpoint"
 export AZURE_OPENAI_EMBEDDING_DEPLOYMENT="text-embedding-3-small"
-export TOONDB_LIB_PATH="/path/to/libtoondb_index.so"
+export SOCHDB_LIB_PATH="/path/to/libsochdb_index.so"
 
 # Optional: For Zep comparison
 export ZEP_API_URL="http://localhost:8000"  # or Zep Cloud
@@ -212,10 +212,10 @@ python3 benchmarks/run_memory_comparison.py
 ```
 ======================================================================
   MEMORY SYSTEM COMPARISON BENCHMARK
-  ToonDB vs Zep
+  SochDB vs Zep
 ======================================================================
 
-  Systems under test: ToonDB, Zep
+  Systems under test: SochDB, Zep
   Configuration:
     Token budgets: [2000, 4000, 8000]
 
@@ -223,7 +223,7 @@ python3 benchmarks/run_memory_comparison.py
   PHASE 1: MICROBENCHMARKS
 ======================================================================
 
-  [ToonDB]
+  [SochDB]
     Generating test data... done
     Testing ingest... done
     Testing retrieval... done
@@ -244,13 +244,13 @@ python3 benchmarks/run_memory_comparison.py
   Phase 1: Microbenchmarks (Retrieval Latency)
   System       p50 (ms)   p95 (ms)   p99 (ms)
   ----------------------------------------------
-  ToonDB       79.49      172.64     2557.91
+  SochDB       79.49      172.64     2557.91
   Zep          85.23      145.67     1234.56
 
   Phase 2: Token Efficiency (2k budget)
   System       Avg Tokens Truncation
   ------------------------------------
-  ToonDB       1847       2.3%
+  SochDB       1847       2.3%
   Zep          1923       1.8%
 
   ... (additional phases)
@@ -276,7 +276,7 @@ python3 benchmarks/run_memory_comparison.py
 
 **Scaling**:
 - Degradation: <10x from 100→2000 is excellent
-- O(log n): ToonDB HNSW should achieve this
+- O(log n): SochDB HNSW should achieve this
 - O(n): Brute-force degrades 20-50x
 
 ## Next Steps
@@ -307,7 +307,7 @@ python3 benchmarks/run_memory_comparison.py
 
 - **Zep vs Mem0 Blog**: https://blog.getzep.com/lies-damn-lies-statistics-is-mem0-really-sota-in-agent-memory/
 - **LoCoMo Benchmark**: https://github.com/snap-research/LoCoMo
-- **ToonDB Docs**: https://docs.rs/toondb
+- **SochDB Docs**: https://docs.rs/sochdb
 - **Zep Docs**: https://docs.getzep.com
 - **Our Previous Benchmarks**: See `BENCHMARK_SUMMARY.md` for O(n) vs O(log n) results
 

@@ -2,7 +2,7 @@
 Memory System Benchmark Harness
 ================================
 
-Apples-to-apples comparison of ToonDB vs Zep for agent memory systems.
+Apples-to-apples comparison of SochDB vs Zep for agent memory systems.
 
 Both systems implement the same contract:
 - ingest_messages(user_id, session_id, messages[])
@@ -131,7 +131,7 @@ class MemorySystemAdapter(abc.ABC):
     """
     Unified interface for memory systems.
 
-    Both ToonDB and Zep must implement this contract for fair comparison.
+    Both SochDB and Zep must implement this contract for fair comparison.
     """
 
     def __init__(self, config: Dict[str, Any]):

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB 360° Performance Benchmark Suite
+SochDB 360° Performance Benchmark Suite
 
 Covers:
 1. Retrieval Quality (Recall@k, MRR, NDCG, filter-aware)
@@ -12,7 +12,7 @@ Covers:
 7. Agent Memory Metrics (write/read quality, staleness)
 
 Usage:
-    PYTHONPATH=toondb-python-sdk/src TOONDB_LIB_PATH=target/release python3 benchmarks/toondb_360_benchmark.py
+    PYTHONPATH=sochdb-python-sdk/src SOCHDB_LIB_PATH=target/release python3 benchmarks/sochdb_360_benchmark.py
 """
 
 import os
@@ -99,7 +99,7 @@ def generate_vectors(n: int, dim: int, seed: int = 42) -> np.ndarray:
 def compute_ground_truth_cosine(vectors: np.ndarray, queries: np.ndarray, k: int) -> Tuple[np.ndarray, np.ndarray]:
     """Compute exact top-k neighbors using brute-force Cosine distance.
     
-    ToonDB uses COSINE distance by default (see hnsw.rs line 197).
+    SochDB uses COSINE distance by default (see hnsw.rs line 197).
     Cosine distance = 1 - cosine_similarity = 1 - (a·b)/(||a||·||b||)
     
     This is the HONEST approach - matching the actual distance metric used.
@@ -200,11 +200,11 @@ def compute_latency_stats(latencies: List[float]) -> LatencyMetrics:
 # Main Benchmark Suite
 # =============================================================================
 
-class ToonDB360Benchmark:
-    """Comprehensive ToonDB benchmark suite."""
+class SochDB360Benchmark:
+    """Comprehensive SochDB benchmark suite."""
     
     def __init__(self, num_vectors: int = 10000, dimension: int = 128):
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         
         self.num_vectors = num_vectors
         self.dimension = dimension
@@ -215,8 +215,8 @@ class ToonDB360Benchmark:
         self.vectors = generate_vectors(num_vectors, dimension)
         self.queries = generate_vectors(self.num_queries, dimension, seed=123)
         
-        # Compute ground truth using COSINE distance (ToonDB's default metric)
-        print("   Computing ground truth (Cosine distance - matches ToonDB default)...")
+        # Compute ground truth using COSINE distance (SochDB's default metric)
+        print("   Computing ground truth (Cosine distance - matches SochDB default)...")
         self.ground_truth = {}
         self.ground_truth_distances = {}
         for k in [1, 5, 10, 20, 100]:
@@ -426,7 +426,7 @@ class ToonDB360Benchmark:
         """Measure insert, update, delete performance."""
         print("\n   [4] Ingestion & Updates")
         
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         
         metrics = IngestionMetrics()
         
@@ -455,8 +455,8 @@ class ToonDB360Benchmark:
         found = any(int(idx) == 999999 for idx, _ in results)
         print(f"      Time-to-searchable: {metrics.time_to_searchable_ms:.2f}ms (found: {found})")
         
-        # Note: ToonDB doesn't support updates/deletes yet, so we skip those
-        print(f"      Update/Delete: Not yet supported in ToonDB")
+        # Note: SochDB doesn't support updates/deletes yet, so we skip those
+        print(f"      Update/Delete: Not yet supported in SochDB")
         
         return metrics
     
@@ -474,7 +474,7 @@ class ToonDB360Benchmark:
         process = psutil.Process()
         mem_before = process.memory_info().rss
         
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         test_index = VectorIndex(dimension=self.dimension, max_connections=16, ef_construction=100)
         ids = np.arange(self.num_vectors, dtype=np.uint64)
         test_index.insert_batch(ids, self.vectors)
@@ -507,7 +507,7 @@ class ToonDB360Benchmark:
         """Measure performance across different configurations."""
         print("\n   [6] Feature Performance")
         
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         
         results = {}
         
@@ -554,7 +554,7 @@ class ToonDB360Benchmark:
         """Simulate agent memory workload."""
         print("\n   [7] Agent Memory Simulation")
         
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         
         metrics = AgentMemoryMetrics()
         
@@ -634,7 +634,7 @@ class ToonDB360Benchmark:
     def run_all(self) -> Dict:
         """Run the complete benchmark suite."""
         print("="*70)
-        print("  TOONDB 360° PERFORMANCE BENCHMARK")
+        print("  SOCHDB 360° PERFORMANCE BENCHMARK")
         print("="*70)
         print(f"\n  Configuration: {self.num_vectors:,} vectors, {self.dimension}-dim")
         
@@ -658,7 +658,7 @@ class ToonDB360Benchmark:
 def generate_report(results: Dict) -> str:
     """Generate markdown report."""
     report = []
-    report.append("# ToonDB 360° Performance Report\n")
+    report.append("# SochDB 360° Performance Report\n")
     report.append(f"Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
     
     # Retrieval Quality
@@ -711,7 +711,7 @@ def generate_report(results: Dict) -> str:
 # =============================================================================
 
 def main():
-    benchmark = ToonDB360Benchmark(num_vectors=10000, dimension=128)
+    benchmark = SochDB360Benchmark(num_vectors=10000, dimension=128)
     results = benchmark.run_all()
     
     # Print summary

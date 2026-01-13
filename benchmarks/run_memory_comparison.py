@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB vs Zep Memory System Comparison
+SochDB vs Zep Memory System Comparison
 =======================================
 
 Apples-to-apples benchmark of agent memory systems.
@@ -12,7 +12,7 @@ Phases:
 4. Scale test (performance under load)
 
 Usage:
-    export TOONDB_LIB_PATH=/path/to/libtoondb_index.so
+    export SOCHDB_LIB_PATH=/path/to/libsochdb_index.so
     export AZURE_OPENAI_API_KEY=your_key
     export AZURE_OPENAI_ENDPOINT=your_endpoint
 
@@ -40,7 +40,7 @@ from memory_benchmark_harness import (
     BenchmarkMetrics,
     get_benchmark_config
 )
-from adapters.toondb_adapter import ToonDBAdapter
+from adapters.sochdb_adapter import SochDBAdapter
 from adapters.zep_adapter import ZepAdapter
 from workload_generator import (
     SyntheticWorkloadGenerator,
@@ -68,9 +68,9 @@ class MemoryBenchmarkRunner:
 
     def _init_adapters(self):
         """Initialize memory system adapters"""
-        # ToonDB
-        toondb_config = {
-            "db_path": "/tmp/toondb_benchmark.db",
+        # SochDB
+        sochdb_config = {
+            "db_path": "/tmp/sochdb_benchmark.db",
             "embedding_dim": self.config.embedding_dim,
             "hnsw_m": 16,
             "hnsw_ef_construction": 100,
@@ -78,10 +78,10 @@ class MemoryBenchmarkRunner:
         }
 
         try:
-            self.adapters["ToonDB"] = ToonDBAdapter(toondb_config)
-            print("✓ ToonDB adapter initialized")
+            self.adapters["SochDB"] = SochDBAdapter(sochdb_config)
+            print("✓ SochDB adapter initialized")
         except Exception as e:
-            print(f"✗ ToonDB initialization failed: {e}")
+            print(f"✗ SochDB initialization failed: {e}")
 
         # Zep
         zep_config = {
@@ -368,7 +368,7 @@ class MemoryBenchmarkRunner:
         """Run all benchmark phases"""
         print("="*70)
         print("  MEMORY SYSTEM COMPARISON BENCHMARK")
-        print("  ToonDB vs Zep")
+        print("  SochDB vs Zep")
         print("="*70)
         print(f"\n  Systems under test: {', '.join(self.adapters.keys())}")
         print(f"  Configuration:")

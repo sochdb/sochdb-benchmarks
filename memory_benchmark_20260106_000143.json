@@ -1,6 +1,6 @@
 [
   {
-    "system": "ToonDB",
+    "system": "SochDB",
     "insert_avg_ms": 152.44438076923072,
     "search_p50_ms": 121.2814590000022,
     "search_p95_ms": 260.52100000000064,

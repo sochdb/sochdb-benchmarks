@@ -26,9 +26,9 @@ except ImportError:
     chromadb = None
 
 try:
-    import toondb
+    import sochdb
 except ImportError:
-    toondb = None
+    sochdb = None
 
 # =============================================================================
 # CONFIGURATION
@@ -50,22 +50,22 @@ class BaseAgentMemory:
         raise NotImplementedError
 
 # =============================================================================
-# TOONDB IMPLEMENTATION (Unified)
+# SOCHDB IMPLEMENTATION (Unified)
 # =============================================================================
-class ToonDBMemory(BaseAgentMemory):
+class SochDBMemory(BaseAgentMemory):
     def __init__(self, path: str):
         self.path = path
         if os.path.exists(path):
             shutil.rmtree(path)
         
-        self.db = toondb.Database.open(path)
+        self.db = sochdb.Database.open(path)
         self.ns = self.db.get_or_create_namespace("agent_007")
         self.collection = self.ns.create_collection("episodic_memory", dimension=DIMENSION)
 
     def add_observation(self, text: str, vector: List[float], metadata: Dict):
         # ID is a timestamp-based or uuid
         obs_id = str(metadata['timestamp']) + "_" + str(uuid.uuid4())[:8]
-        # In ToonDB, we store content and metadata directly with the vector
+        # In SochDB, we store content and metadata directly with the vector
         self.collection.insert(
             id=obs_id,
             vector=vector,
@@ -75,7 +75,7 @@ class ToonDBMemory(BaseAgentMemory):
 
     def recall(self, query: List[float], min_timestamp: int) -> List[str]:
         # Filter: "timestamp" > min_timestamp
-        # ToonDB supports metadata filtering
+        # SochDB supports metadata filtering
         results = self.collection.vector_search(
             vector=query,
             k=TOP_K,
@@ -85,7 +85,7 @@ class ToonDBMemory(BaseAgentMemory):
         return [r.content for r in results]
 
     def name(self) -> str:
-        return "ToonDB (Unified)"
+        return "SochDB (Unified)"
 
     def cleanup(self):
         # No explicit close needed for embedded usually, but good practice
@@ -232,16 +232,16 @@ if __name__ == "__main__":
     
     results = {}
     
-    # Run ToonDB
-    if toondb:
+    # Run SochDB
+    if sochdb:
         try:
-            mem = ToonDBMemory("/tmp/bench_toondb_macro")
+            mem = SochDBMemory("/tmp/bench_sochdb_macro")
             metrics = run_benchmark(mem)
-            results["toondb"] = metrics
+            results["sochdb"] = metrics
             mem.cleanup()
-            shutil.rmtree("/tmp/bench_toondb_macro", ignore_errors=True)
+            shutil.rmtree("/tmp/bench_sochdb_macro", ignore_errors=True)
         except Exception as e:
-            print(f"ToonDB failed: {e}")
+            print(f"SochDB failed: {e}")
             import traceback
             traceback.print_exc()
 
@@ -262,7 +262,7 @@ if __name__ == "__main__":
     print("MACRO-BENCHMARK RESULTS (End-to-End Latency)")
     print("="*60)
     
-    for sys_name in ["toondb", "fragmented"]:
+    for sys_name in ["sochdb", "fragmented"]:
         if sys_name in results:
             m = results[sys_name]
             print(f"\nSystem: {sys_name.upper()}")

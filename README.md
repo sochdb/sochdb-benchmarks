@@ -1,6 +1,6 @@
-# ToonDB Benchmarks
+# SochDB Benchmarks
 
-This repository contains reproducible benchmarks comparing **ToonDB** against other vector stores and agent memory systems.
+This repository contains reproducible benchmarks comparing **SochDB** against other vector stores and agent memory systems.
 
 **📊 [See Published Results](PUBLISHED_RESULTS.md)** - Comprehensive benchmark findings with real LLM integration
 
@@ -9,7 +9,7 @@ This repository contains reproducible benchmarks comparing **ToonDB** against ot
 We provide benchmarks across different dimensions:
 - **Vector search scaling** (O(n) vs O(log n))
 - **Real LLM integration** (actual Azure OpenAI calls)
-- **Multi-system comparison** (ToonDB vs ChromaDB, Zep framework ready)
+- **Multi-system comparison** (SochDB vs ChromaDB, Zep framework ready)
 - **Production-grade framework** (2000+ lines, fully reproducible)
 
 ## Performance Snapshot
@@ -18,7 +18,7 @@ We provide benchmarks across different dimensions:
 
 | Database | Insert Rate | Search Latency (Avg) | Storage Engine | Primary Use Case |
 | :--- | :--- | :--- | :--- | :--- |
-| **ToonDB** | ~2,377 vec/s | **0.325 ms** | In-Memory (Rust) + WAL | Low-Latency Search, Agent Memory |
+| **SochDB** | ~2,377 vec/s | **0.325 ms** | In-Memory (Rust) + WAL | Low-Latency Search, Agent Memory |
 | **LanceDB** | **96,852 vec/s** | 4.07 ms | Disk-Based (Lance) | Large Datasets, High-Throughput Ingestion |
 | **ChromaDB** | ~10,500 vec/s | 0.69 ms | In-Memory / SQLite | General Purpose RAG, Prototyping |
 | **DuckDB** | ~3,900 vec/s | 0.90 ms | OLAP + VSS | Analytical + Vector Search Hybrid |
@@ -31,7 +31,7 @@ We provide benchmarks across different dimensions:
 **CPU**: Intel(R) Xeon(R) Platinum 8370C @ 2.80GHz (3 vCPU)  
 **Command**:
 ```bash
-TOONDB_LIB_PATH=/root/.pyenv/versions/3.12.12/lib/python3.12/site-packages/toondb/lib/x86_64-unknown-linux-gnu/libtoondb_index.so \
+SOCHDB_LIB_PATH=/root/.pyenv/versions/3.12.12/lib/python3.12/site-packages/sochdb/lib/x86_64-unknown-linux-gnu/libsochdb_index.so \
   python3 benchmarks/comprehensive_benchmark.py
 ```
 
@@ -42,9 +42,9 @@ TOONDB_LIB_PATH=/root/.pyenv/versions/3.12.12/lib/python3.12/site-packages/toond
 | NumPy (brute-force) | N/A | 0.359 | Baseline |
 | ChromaDB | 3,925 | 1.548 | — |
 | LanceDB | 18,245 | 14.039 | IVF-PQ index |
-| ToonDB | 2,442 | 0.580 | Rust HNSW via Python FFI |
+| SochDB | 2,442 | 0.580 | Rust HNSW via Python FFI |
 
-### Multi-Configuration (ToonDB)
+### Multi-Configuration (SochDB)
 
 | Config | Insert (vec/s) | Search (ms avg) |
 | :--- | ---: | ---: |
@@ -60,20 +60,20 @@ TOONDB_LIB_PATH=/root/.pyenv/versions/3.12.12/lib/python3.12/site-packages/toond
 
 ## 🏗️ Systems Engineering Evaluation
 
-Beyond microbenchmarks, we stress-tested ToonDB's "Actual" production capability for Agentic workloads. 
+Beyond microbenchmarks, we stress-tested SochDB's "Actual" production capability for Agentic workloads. 
 
 ### 1. The "Agent Loop" Macrobenchmark
 We simulated a long-running agent conversation where the system must simultaneously **Write** new observations and **Read/Assemble** context for a prompt.
 
-| Metric (P99 Latency) | ToonDB (Unified) | SQLite + Chroma (Fragmented) | Improvement |
+| Metric (P99 Latency) | SochDB (Unified) | SQLite + Chroma (Fragmented) | Improvement |
 | :--- | :--- | :--- | :--- |
 | **Write (Append)** | **0.01 ms** | 2.80 ms | **280x** Faster |
 | **Read (Context)** | **0.01 ms** | 3.06 ms | **300x** Faster |
 
-> **Why This Matters**: ToonDB acts as an integrated memory layer. The "Fragmented" baseline requires network/IPC hops between Python, SQLite, and Chroma. ToonDB keeps the "Thought Loop" tight.
+> **Why This Matters**: SochDB acts as an integrated memory layer. The "Fragmented" baseline requires network/IPC hops between Python, SQLite, and Chroma. SochDB keeps the "Thought Loop" tight.
 
 ### 2. Transactional Integrity (Crash Test)
-We subjected ToonDB to a "Jepsen-lite" test: heavily writing to a key and randomly force-killing the process (`kill -9`).
+We subjected SochDB to a "Jepsen-lite" test: heavily writing to a key and randomly force-killing the process (`kill -9`).
 
 - **Result**: ✅ PASSED
 - **Recovery Time**: 4.31 ms
@@ -83,7 +83,7 @@ We subjected ToonDB to a "Jepsen-lite" test: heavily writing to a key and random
 We isolated the cosine distance kernel to check SIMD usage on ARM (Apple M1 Max).
 
 - **Finding**: Raw kernel throughput via FFI is lower than NumPy (0.08x) due to Python<->Rust boundary overhead on single queries.
-- **Verdict**: ToonDB is optimal for **Search** (where work stays in Rust) but has high overhead for basic vector math ops in Python compared to highly optimized BLAS.
+- **Verdict**: SochDB is optimal for **Search** (where work stays in Rust) but has high overhead for basic vector math ops in Python compared to highly optimized BLAS.
 
 ## 🤖 Agent Memory Systems Benchmark
 
@@ -113,7 +113,7 @@ This benchmark uses **pre-generated random embeddings** to isolate pure vector s
 
 **Run the benchmark:**
 ```bash
-export TOONDB_LIB_PATH=/path/to/libtoondb_index.so
+export SOCHDB_LIB_PATH=/path/to/libsochdb_index.so
 python3 benchmarks/pure_search_scale_benchmark.py
 ```
 
@@ -132,15 +132,15 @@ This benchmark uses **actual Azure OpenAI embedding calls** to test memory syste
 - **Embeddings**: Azure OpenAI `text-embedding-3-small` (1536-dim)
 - **Date**: 2026-01-04
 
-#### Results: ToonDB vs ChromaDB
+#### Results: SochDB vs ChromaDB
 
 | System | Insert (avg) | p50 Latency | p95 Latency | p99 Latency | Context Size |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| **ToonDB** | 94.20ms | **79.49ms** | 172.64ms | 2557.91ms | 36 tokens |
+| **SochDB** | 94.20ms | **79.49ms** | 172.64ms | 2557.91ms | 36 tokens |
 | **ChromaDB** | 184.90ms | 82.80ms | **123.00ms** | **1338.15ms** | 36 tokens |
 
 **Key Findings:**
-- **ToonDB** is **1.96x faster at insert** (94ms vs 185ms)
+- **SochDB** is **1.96x faster at insert** (94ms vs 185ms)
 - **ChromaDB** has **better p95/p99 consistency** (123ms vs 173ms p95)
 - Both systems delivered **identical context quality** (36 tokens avg)
 - **Real embedding overhead dominates**: 70-90% of latency is Azure OpenAI API calls, not DB operations
@@ -155,13 +155,13 @@ Unlike synthetic vector benchmarks, this test measures:
 
 **Run the benchmark:**
 ```bash
-export TOONDB_LIB_PATH=/path/to/libtoondb_index.so
+export SOCHDB_LIB_PATH=/path/to/libsochdb_index.so
 python3 benchmarks/memory_systems_comparison.py
 ```
 
 ## detailed Comparison
 
-### ToonDB
+### SochDB
 - **Performance Profile**: Optimized for low-latency search (0.33ms) and fast inserts for agent memory.
 - **Architecture**: In-memory HNSW index with Rust core, Python FFI.
 - **Trade-off**: Lower ingestion throughput compared to columnar stores on bulk loads.
@@ -176,7 +176,7 @@ python3 benchmarks/memory_systems_comparison.py
 ### ChromaDB
 - **Performance Profile**: Balanced performance for general use cases.
 - **Architecture**: Persistent storage with HNSW indexing.
-- **Trade-off**: Slower search than ToonDB, slower ingestion than LanceDB.
+- **Trade-off**: Slower search than SochDB, slower ingestion than LanceDB.
 - **Best For**: General-purpose RAG, prototyping, moderate-scale applications.
 
 ## Verification
@@ -202,7 +202,7 @@ NumPy (brute-force)       N/A                0.619           1.0x (baseline)
 ChromaDB                  10558              0.687           0.9x
 DuckDB                    3886               0.904           0.7x
 LanceDB                   96852              4.074           0.2x
-ToonDB                    2377               0.325           1.9x
+SochDB                    2377               0.325           1.9x
 ```
 
 ## Running the Benchmarks
@@ -226,7 +226,7 @@ ToonDB                    2377               0.325           1.9x
    python3 benchmarks/crash_test.py
    ```
 
-### Production-Grade Comparison: ToonDB vs Zep
+### Production-Grade Comparison: SochDB vs Zep
 
 For a comprehensive, apples-to-apples comparison of agent memory systems:
 
@@ -234,7 +234,7 @@ For a comprehensive, apples-to-apples comparison of agent memory systems:
 # Set up environment
 export AZURE_OPENAI_API_KEY="your_key"
 export AZURE_OPENAI_ENDPOINT="your_endpoint"
-export TOONDB_LIB_PATH="/path/to/libtoondb_index.so"
+export SOCHDB_LIB_PATH="/path/to/libsochdb_index.so"
 
 # Optional: Add Zep for comparison
 export ZEP_API_URL="http://localhost:8000"

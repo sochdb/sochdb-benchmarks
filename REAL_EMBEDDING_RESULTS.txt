@@ -18,16 +18,16 @@
 
 | Database | Insert Time (ms) | Insert Rate (vec/s) | Search p50 (ms) | Search p99 (ms) |
 |----------|------------------|---------------------|-----------------|-----------------|
-| ToonDB   | 108.1 ms         | ~9,250              | **0.47 ms**     | **0.57 ms**     |
+| SochDB   | 108.1 ms         | ~9,250              | **0.47 ms**     | **0.57 ms**     |
 | ChromaDB | 290.5 ms         | ~3,440              | 1.22 ms         | 1.63 ms         |
 | LanceDB  | **95.5 ms**      | **~10,470**         | 8.60 ms         | 10.22 ms        |
 
 3. ANALYSIS
 -----------
-- **Fastest Search**: ToonDB (0.47 ms). It is ~2.5x faster than ChromaDB and ~18x faster than LanceDB (likely due to LanceDB running flat search without explicit index build).
-- **Fastest Insert**: LanceDB (95.5 ms). ToonDB is close (108 ms). ChromaDB is significantly slower (290 ms).
-- **Bottleneck**: The Embedding API accounts for 99.8% of the total runtime. Choosing a fast Vector DB like ToonDB eliminates the remaining 0.2% latency, but the AI model is the limit.
+- **Fastest Search**: SochDB (0.47 ms). It is ~2.5x faster than ChromaDB and ~18x faster than LanceDB (likely due to LanceDB running flat search without explicit index build).
+- **Fastest Insert**: LanceDB (95.5 ms). SochDB is close (108 ms). ChromaDB is significantly slower (290 ms).
+- **Bottleneck**: The Embedding API accounts for 99.8% of the total runtime. Choosing a fast Vector DB like SochDB eliminates the remaining 0.2% latency, but the AI model is the limit.
 
 4. CONCLUSION
 -------------
-ToonDB provides the best low-latency search p50/p99 among the tested systems for this dataset size, while maintaining competitive insert speeds.
+SochDB provides the best low-latency search p50/p99 among the tested systems for this dataset size, while maintaining competitive insert speeds.

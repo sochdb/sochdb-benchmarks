@@ -1,4 +1,4 @@
-# ToonDB Vector Search Scaling Analysis
+# SochDB Vector Search Scaling Analysis
 
 ## Problem Statement
 
@@ -59,7 +59,7 @@ Based on O(log n) scaling, at **10,000 observations**:
 ## Implementation Example
 
 ```python
-from toondb import VectorIndex
+from sochdb import VectorIndex
 import numpy as np
 
 # Create HNSW index
@@ -96,7 +96,7 @@ for idx, score in results:
 
 ```bash
 # Pure vector search scaling benchmark (fast, no API calls)
-export TOONDB_LIB_PATH=/path/to/libtoondb_index.so
+export SOCHDB_LIB_PATH=/path/to/libsochdb_index.so
 python3 benchmarks/pure_search_scale_benchmark.py
 
 # Real LLM integration test (slower, uses Azure OpenAI)

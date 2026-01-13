@@ -6,10 +6,10 @@ Tests end-to-end performance including:
 1. Embedding generation time
 2. Vector insertion time
 3. Search latency with real embeddings
-4. Comparison across ToonDB, ChromaDB, LanceDB
+4. Comparison across SochDB, ChromaDB, LanceDB
 
 Usage:
-    PYTHONPATH=toondb-python-sdk/src TOONDB_LIB_PATH=target/release python3 benchmarks/real_embedding_benchmark.py
+    PYTHONPATH=sochdb-python-sdk/src SOCHDB_LIB_PATH=target/release python3 benchmarks/real_embedding_benchmark.py
 """
 
 import os
@@ -138,11 +138,11 @@ class EmbeddingClient:
 # Database Adapters
 # =============================================================================
 
-class ToonDBAdapter:
-    name = "ToonDB"
+class SochDBAdapter:
+    name = "SochDB"
     
     def __init__(self, dimension: int):
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         self.index = VectorIndex(dimension=dimension, max_connections=32, ef_construction=200)
         self.count = 0
     
@@ -270,7 +270,7 @@ def main():
     print("-"*70)
     
     adapters = [
-        ToonDBAdapter(embed_client.dimension),
+        SochDBAdapter(embed_client.dimension),
         ChromaDBAdapter(embed_client.dimension),
         LanceDBAdapter(embed_client.dimension),
     ]
@@ -326,16 +326,16 @@ def main():
     print(f"  {'-'*50}")
     
     embed_time = embed_client.metrics.total_time_ms
-    toondb_insert = results.get("ToonDB", {}).get("insert_ms", 0)
-    toondb_search = results.get("ToonDB", {}).get("search_avg_ms", 0) * NUM_QUERIES
+    sochdb_insert = results.get("SochDB", {}).get("insert_ms", 0)
+    sochdb_search = results.get("SochDB", {}).get("search_avg_ms", 0) * NUM_QUERIES
     
-    total_time = embed_time + toondb_insert + toondb_search
+    total_time = embed_time + sochdb_insert + sochdb_search
     
     print(f"  Embedding API:  {embed_time/1000:.1f}s ({embed_time/total_time*100:.1f}%)")
-    print(f"  ToonDB Insert:  {toondb_insert/1000:.3f}s ({toondb_insert/total_time*100:.1f}%)")
-    print(f"  ToonDB Search:  {toondb_search/1000:.3f}s ({toondb_search/total_time*100:.1f}%)")
+    print(f"  SochDB Insert:  {sochdb_insert/1000:.3f}s ({sochdb_insert/total_time*100:.1f}%)")
+    print(f"  SochDB Search:  {sochdb_search/1000:.3f}s ({sochdb_search/total_time*100:.1f}%)")
     
-    print(f"\n  🎯 Conclusion: Embedding API is {embed_time / (toondb_insert + toondb_search):.0f}x slower than ToonDB")
+    print(f"\n  🎯 Conclusion: Embedding API is {embed_time / (sochdb_insert + sochdb_search):.0f}x slower than SochDB")
     print("="*70)
 
 

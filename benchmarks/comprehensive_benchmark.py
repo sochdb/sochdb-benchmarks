@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Comprehensive Vector Search Benchmark
-ToonDB vs ChromaDB vs NumPy (brute-force)
+SochDB vs ChromaDB vs NumPy (brute-force)
 
 Tests multiple configurations and provides Python SDK examples.
 """
@@ -11,7 +11,7 @@ import os
 import shutil
 import numpy as np
 import sys
-from toondb import VectorIndex
+from sochdb import VectorIndex
 
 def generate_vectors(n: int, dim: int, seed: int = 42) -> np.ndarray:
     """Generate random unit vectors"""
@@ -24,24 +24,24 @@ def generate_vectors(n: int, dim: int, seed: int = 42) -> np.ndarray:
 # 1. PYTHON SDK USAGE EXAMPLES
 # =============================================================================
 
-def demo_toondb_usage():
-    """Show ToonDB Python SDK usage examples"""
+def demo_sochdb_usage():
+    """Show SochDB Python SDK usage examples"""
     print("\n" + "="*70)
-    print("   TOONDB PYTHON SDK USAGE EXAMPLES")
+    print("   SOCHDB PYTHON SDK USAGE EXAMPLES")
     print("="*70)
     
-    from toondb import VectorIndex
+    from sochdb import VectorIndex
     
     print("""
 # Installation (from source)
-pip install ./toondb-python-sdk
+pip install ./sochdb-python-sdk
 
 # Or set paths for development:
-# TOONDB_LIB_PATH=/path/to/target/release
-# PYTHONPATH=/path/to/toondb-python-sdk/src
+# SOCHDB_LIB_PATH=/path/to/target/release
+# PYTHONPATH=/path/to/sochdb-python-sdk/src
 
 # 1. Create an index
-from toondb import VectorIndex
+from sochdb import VectorIndex
 import numpy as np
 
 index = VectorIndex(
@@ -295,21 +295,21 @@ def benchmark_chromadb(vectors: np.ndarray, queries: np.ndarray, k: int = 10):
     }
 
 # =============================================================================
-# 4. TOONDB BENCHMARK
+# 4. SOCHDB BENCHMARK
 # =============================================================================
 
-def benchmark_toondb(vectors: np.ndarray, queries: np.ndarray, k: int = 10):
-    """Benchmark ToonDB Vector Index"""
+def benchmark_sochdb(vectors: np.ndarray, queries: np.ndarray, k: int = 10):
+    """Benchmark SochDB Vector Index"""
     try:
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         if VectorIndex is None:
             raise ImportError("VectorIndex not available")
     except ImportError as e:
-        print(f"\nToonDB VectorIndex not available: {e}")
+        print(f"\nSochDB VectorIndex not available: {e}")
         return None
 
     print("\n" + "="*70)
-    print("   TOONDB (Rust HNSW via Python FFI)")
+    print("   SOCHDB (Rust HNSW via Python FFI)")
     print("="*70)
     
     dim = vectors.shape[1]
@@ -520,7 +520,7 @@ def run_multi_config_benchmark():
         {"num_vectors": 10000, "dim": 768, "queries": 100},  # BERT dim
     ]
     
-    from toondb import VectorIndex
+    from sochdb import VectorIndex
     
     results = []
     
@@ -575,11 +575,11 @@ def run_multi_config_benchmark():
 def main():
     print("="*70)
     print("   COMPREHENSIVE VECTOR SEARCH BENCHMARK")
-    print("   ToonDB vs ChromaDB vs DuckDB vs LanceDB vs NumPy")
+    print("   SochDB vs ChromaDB vs DuckDB vs LanceDB vs NumPy")
     print("="*70)
     
     # 1. SDK Usage Examples
-    demo_toondb_usage()
+    demo_sochdb_usage()
     
     # 2. Standard benchmark (10K vectors, 128-dim)
     print("\n\n" + "#"*70)
@@ -610,8 +610,8 @@ def main():
     # LanceDB
     results['lancedb'] = benchmark_lancedb(vectors, queries)
     
-    # ToonDB
-    results['toondb'] = benchmark_toondb(vectors, queries)
+    # SochDB
+    results['sochdb'] = benchmark_sochdb(vectors, queries)
     
     # 3. Multi-config benchmark
     run_multi_config_benchmark()
@@ -650,10 +650,10 @@ def main():
         speedup = numpy_latency / r['avg_latency']
         print(f"{'LanceDB':<25} {r['insert_rate']:.0f}{'':<10} {r['avg_latency']:.3f}{'':<10} {speedup:.1f}x")
     
-    if results.get('toondb'):
-        r = results['toondb']
+    if results.get('sochdb'):
+        r = results['sochdb']
         speedup = numpy_latency / r['avg_latency']
-        print(f"{'ToonDB':<25} {r['insert_rate']:.0f}{'':<10} {r['avg_latency']:.3f}{'':<10} {speedup:.1f}x")
+        print(f"{'SochDB':<25} {r['insert_rate']:.0f}{'':<10} {r['avg_latency']:.3f}{'':<10} {speedup:.1f}x")
     
     # Performance Analysis
     print("\n" + "="*70)
@@ -662,7 +662,7 @@ def main():
     
     # Find best performer
     all_systems = []
-    for name in ['chromadb', 'duckdb', 'lancedb', 'toondb']:
+    for name in ['chromadb', 'duckdb', 'lancedb', 'sochdb']:
         if results.get(name):
             all_systems.append((name, results[name]))
     
@@ -675,15 +675,15 @@ def main():
         print(f"\n  Highest Insert Rate: {best_insert[0].upper()} ({best_insert[1]['insert_rate']:.0f} vec/s)")
         print(f"  Lowest Search Latency: {best_search[0].upper()} ({best_search[1]['avg_latency']:.3f}ms)")
         
-        if results.get('toondb'):
-            t = results['toondb']
-            print(f"\n  Relative Performance (ToonDB baseline):")
+        if results.get('sochdb'):
+            t = results['sochdb']
+            print(f"\n  Relative Performance (SochDB baseline):")
             for name, r in all_systems:
-                if name != 'toondb':
+                if name != 'sochdb':
                     insert_ratio = t['insert_rate'] / max(r['insert_rate'], 0.001)
                     search_ratio = r['avg_latency'] / max(t['avg_latency'], 0.001)
-                    # "ToonDB is X times faster/slower"
-                    # If ratio > 1, ToonDB is X times faster/more
+                    # "SochDB is X times faster/slower"
+                    # If ratio > 1, SochDB is X times faster/more
                     
                     insert_str = f"{insert_ratio:.2f}x"
                     search_str = f"{search_ratio:.2f}x"
@@ -717,19 +717,19 @@ def run_benchmark(params: dict, runs: int = 3) -> dict:
     
     # Collect results across runs
     all_results = {
-        'toondb': [],
+        'sochdb': [],
         'chromadb': [],
         'numpy': [],
     }
     
     for run_idx in range(runs):
-        # ToonDB
+        # SochDB
         try:
-            result = benchmark_toondb(vectors, queries, k)
+            result = benchmark_sochdb(vectors, queries, k)
             if result:
-                all_results['toondb'].append(result)
+                all_results['sochdb'].append(result)
         except Exception as e:
-            print(f"ToonDB run {run_idx+1} failed: {e}")
+            print(f"SochDB run {run_idx+1} failed: {e}")
         
         # ChromaDB
         try:
@@ -757,14 +757,14 @@ def run_benchmark(params: dict, runs: int = 3) -> dict:
     
     metrics = {}
     
-    # ToonDB metrics
-    if all_results['toondb']:
-        toondb_runs = all_results['toondb']
-        metrics['toondb_insert_vec_per_s'] = median([r['insert_rate'] for r in toondb_runs])
-        metrics['toondb_search_ms_avg'] = median([r['avg_latency'] for r in toondb_runs])
-        metrics['toondb_search_ms_p50'] = median([r['p50'] for r in toondb_runs])
-        metrics['toondb_search_ms_p99'] = median([r['p99'] for r in toondb_runs])
-        metrics['toondb_qps'] = 1000.0 / metrics['toondb_search_ms_avg'] if metrics['toondb_search_ms_avg'] > 0 else 0
+    # SochDB metrics
+    if all_results['sochdb']:
+        sochdb_runs = all_results['sochdb']
+        metrics['sochdb_insert_vec_per_s'] = median([r['insert_rate'] for r in sochdb_runs])
+        metrics['sochdb_search_ms_avg'] = median([r['avg_latency'] for r in sochdb_runs])
+        metrics['sochdb_search_ms_p50'] = median([r['p50'] for r in sochdb_runs])
+        metrics['sochdb_search_ms_p99'] = median([r['p99'] for r in sochdb_runs])
+        metrics['sochdb_qps'] = 1000.0 / metrics['sochdb_search_ms_avg'] if metrics['sochdb_search_ms_avg'] > 0 else 0
     
     # ChromaDB metrics
     if all_results['chromadb']:

@@ -1,8 +1,8 @@
-# ToonDB vs Zep Memory System Comparison
+# SochDB vs Zep Memory System Comparison
 
 ## Overview
 
-This is a comprehensive, **apples-to-apples** benchmark comparing ToonDB and Zep for agent memory systems.
+This is a comprehensive, **apples-to-apples** benchmark comparing SochDB and Zep for agent memory systems.
 
 Both systems are evaluated on the same job:
 > Given user/session state + history + business docs, return the best context block for the next LLM call under a token budget.
@@ -21,8 +21,8 @@ Both systems are evaluated on the same job:
 
 | System | Config | Mode |
 |--------|--------|------|
-| ToonDB | Default (m=16, ef=100) | Local |
-| ToonDB | Tuned (optimized params) | Local |
+| SochDB | Default (m=16, ef=100) | Local |
+| SochDB | Tuned (optimized params) | Local |
 | Zep | Default/Recommended | Local or Cloud |
 | Zep | Tuned | Local or Cloud |
 
@@ -36,7 +36,7 @@ memory_benchmark_harness.py       # Core interfaces and data models
 └── BenchmarkMetrics              # Metrics collection
 
 adapters/
-├── toondb_adapter.py             # ToonDB implementation
+├── sochdb_adapter.py             # SochDB implementation
 │   └── Uses: HNSW index + hierarchical storage
 └── zep_adapter.py                # Zep implementation
     └── Uses: Zep Memory API + Context Block
@@ -59,8 +59,8 @@ run_memory_comparison.py          # Main benchmark orchestrator
 # 1. Install dependencies
 pip install -r requirements.txt
 
-# 2. Install ToonDB (if not already installed)
-pip install toondb-client
+# 2. Install SochDB (if not already installed)
+pip install sochdb
 
 # 3. Optional: Install Zep for comparison
 pip install zep-python
@@ -83,8 +83,8 @@ export AZURE_OPENAI_API_KEY="your_key"
 export AZURE_OPENAI_ENDPOINT="your_endpoint"
 export AZURE_OPENAI_EMBEDDING_DEPLOYMENT="text-embedding-3-small"
 
-# Required: ToonDB library path
-export TOONDB_LIB_PATH="/path/to/libtoondb_index.so"
+# Required: SochDB library path
+export SOCHDB_LIB_PATH="/path/to/libsochdb_index.so"
 
 # Optional: Zep (for comparison)
 export ZEP_API_URL="http://localhost:8000"  # or Zep Cloud URL
@@ -193,7 +193,7 @@ Results are saved to `benchmark_results/comparison_results_TIMESTAMP.json`:
 ```json
 {
   "phase1_microbenchmarks": {
-    "ToonDB": {
+    "SochDB": {
       "ingest_avg_ms": 94.2,
       "retrieval_p50_ms": 79.5,
       "retrieval_p95_ms": 172.6,
@@ -232,7 +232,7 @@ Results are saved to `benchmark_results/comparison_results_TIMESTAMP.json`:
 ### Scale
 
 - **Degradation factor**: how much slower at 2000 vs 100 observations
-- **ToonDB target**: O(log n) HNSW should keep degradation minimal
+- **SochDB target**: O(log n) HNSW should keep degradation minimal
 - **Zep target**: Should maintain sub-200ms p95 at scale
 
 ## Fairness Guardrails
@@ -242,7 +242,7 @@ To ensure nobody can dispute results:
 1. ✅ Same embedding model + dimension (text-embedding-3-small, 1536)
 2. ✅ Same top-k and score thresholds (or clearly justified)
 3. ✅ Same LLM + prompt + temperature for evaluation
-4. ✅ Disclosed if Zep is Cloud and ToonDB is local
+4. ✅ Disclosed if Zep is Cloud and SochDB is local
 5. ✅ Both systems use default/recommended settings
 6. ✅ All source code + configs + datasets included
 
@@ -254,7 +254,7 @@ Everything needed to reproduce:
 benchmarks/
 ├── memory_benchmark_harness.py     # Core framework
 ├── adapters/
-│   ├── toondb_adapter.py           # ToonDB implementation
+│   ├── sochdb_adapter.py           # SochDB implementation
 │   └── zep_adapter.py              # Zep implementation
 ├── workload_generator.py           # Dataset generators
 ├── run_memory_comparison.py        # Main runner
@@ -268,7 +268,7 @@ benchmark_results/
 
 Based on design and previous benchmarks:
 
-### ToonDB
+### SochDB
 
 - **Retrieval p95**: 50-200ms (HNSW O(log n))
 - **Scale degradation**: Minimal (5-10x at 2000 obs)
@@ -284,14 +284,14 @@ Based on design and previous benchmarks:
 
 ## Troubleshooting
 
-### ToonDB Issues
+### SochDB Issues
 
 ```bash
 # Library not found
-export TOONDB_LIB_PATH=/usr/local/lib/python3.11/site-packages/toondb/lib/x86_64-unknown-linux-gnu/libtoondb_index.so
+export SOCHDB_LIB_PATH=/usr/local/lib/python3.11/site-packages/sochdb/lib/x86_64-unknown-linux-gnu/libsochdb_index.so
 
 # Check installation
-python3 -c "import toondb; print(toondb.__version__)"
+python3 -c "import sochdb; print(sochdb.__version__)"
 ```
 
 ### Zep Issues
@@ -315,7 +315,7 @@ python3 -c "from openai import AzureOpenAI; client = AzureOpenAI(api_key='$AZURE
 
 ## References
 
-- [ToonDB Documentation](https://docs.rs/toondb)
+- [SochDB Documentation](https://docs.rs/sochdb)
 - [Zep Documentation](https://docs.getzep.com)
 - [LoCoMo Benchmark](https://github.com/snap-research/LoCoMo)
 - [Zep vs Mem0 Blog Post](https://blog.getzep.com/lies-damn-lies-statistics-is-mem0-really-sota-in-agent-memory/)

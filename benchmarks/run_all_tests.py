@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB Complete Test & Benchmark Runner
+SochDB Complete Test & Benchmark Runner
 
 Runs all benchmarks and examples, generates a comprehensive final report.
 """
@@ -18,8 +18,8 @@ PROJECT_DIR = os.path.dirname(BASE_DIR)
 
 ENV = {
     **os.environ,
-    "PYTHONPATH": os.path.join(PROJECT_DIR, "toondb-python-sdk/src"),
-    "TOONDB_LIB_PATH": os.path.join(PROJECT_DIR, "target/release"),
+    "PYTHONPATH": os.path.join(PROJECT_DIR, "sochdb-python-sdk/src"),
+    "SOCHDB_LIB_PATH": os.path.join(PROJECT_DIR, "target/release"),
 }
 
 
@@ -73,7 +73,7 @@ def run_script(name: str, path: str, timeout: int = 120) -> dict:
 
 def main():
     print("=" * 80)
-    print("  TOONDB COMPLETE TEST & BENCHMARK RUNNER")
+    print("  SOCHDB COMPLETE TEST & BENCHMARK RUNNER")
     print("=" * 80)
     print(f"  Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
@@ -93,7 +93,7 @@ def main():
     core_benchmarks = [
         ("Full Benchmark Suite", "benchmarks/full_benchmark_suite.py"),
         ("Reproduce HNSW Bug", "benchmarks/reproduce_hnsw_bug.py"),
-        ("ToonDB vs ChromaDB", "benchmarks/toondb_vs_chromadb.py"),
+        ("SochDB vs ChromaDB", "benchmarks/sochdb_vs_chromadb.py"),
         ("Vector DB Benchmark", "benchmarks/vector_db_benchmark.py"),
     ]
     
@@ -188,7 +188,7 @@ def main():
     # =========================================================================
     report_path = os.path.join(BASE_DIR, "FINAL_BENCHMARK_REPORT.md")
     
-    report = f"""# ToonDB Final Benchmark Report
+    report = f"""# SochDB Final Benchmark Report
 
 Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
@@ -227,7 +227,7 @@ Based on the benchmark results:
 
 1. **Correctness**: HNSW retrieval is working correctly with 98%+ Recall@10
 2. **Performance**: Search latency is excellent (<1ms), insert throughput needs optimization
-3. **Comparison**: ToonDB is 1.2-1.3x faster than ChromaDB on search
+3. **Comparison**: SochDB is 1.2-1.3x faster than ChromaDB on search
 
 ### Priority Fixes
 

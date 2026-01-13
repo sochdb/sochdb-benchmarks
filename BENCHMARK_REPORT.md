@@ -1,4 +1,4 @@
-# 🔥 360° Comprehensive Benchmark: ToonDB vs SQLite
+# 🔥 360° Comprehensive Benchmark: SochDB vs SQLite
 
 **Date:** December 25, 2024  
 **Test Sizes:** 1K, 10K, 100K records  
@@ -8,7 +8,7 @@
 
 ## 📊 Executive Summary
 
-| Metric | SQLite | ToonDB | ToonDB vs SQLite |
+| Metric | SQLite | SochDB | SochDB vs SQLite |
 |--------|--------|--------|------------------|
 | **Best Insert (Memory)** | 2.12M ops/sec | 1.36M ops/sec | **64%** |
 | **Best Insert (Durable)** | 1.64M ops/sec | 0.96M ops/sec | **58%** |
@@ -24,18 +24,18 @@
 |----------|---------|----------------|
 | **SQLite File** | 1,639,903 | 100% (baseline) |
 | **SQLite Memory** | 2,118,517 | 129% |
-| **ToonDB WAL** | 955,651 | 58% |
-| **ToonDB Memory** | 1,358,760 | 83% |
-| **ToonDB Fast** | 1,284,694 | **78%** ✅ |
+| **SochDB WAL** | 955,651 | 58% |
+| **SochDB Memory** | 1,358,760 | 83% |
+| **SochDB Fast** | 1,284,694 | **78%** ✅ |
 
 ### Visual Comparison
 
 ```
 SQLite Memory   ████████████████████████████████████████  2,118,517 ops/sec
 SQLite File     ████████████████████████████████░░░░░░░░  1,639,903 ops/sec
-ToonDB Memory   ██████████████████████████░░░░░░░░░░░░░░  1,358,760 ops/sec
-ToonDB Fast     █████████████████████████░░░░░░░░░░░░░░░  1,284,694 ops/sec
-ToonDB WAL      ██████████████████░░░░░░░░░░░░░░░░░░░░░░    955,651 ops/sec
+SochDB Memory   ██████████████████████████░░░░░░░░░░░░░░  1,358,760 ops/sec
+SochDB Fast     █████████████████████████░░░░░░░░░░░░░░░  1,284,694 ops/sec
+SochDB WAL      ██████████████████░░░░░░░░░░░░░░░░░░░░░░    955,651 ops/sec
 ```
 
 ---
@@ -46,12 +46,12 @@ ToonDB WAL      ██████████████████░░░�
 |----------|---------|----------------|
 | **SQLite File** | 17,769,747 | 100% |
 | **SQLite Memory** | 17,597,628 | 99% |
-| **ToonDB Memory** | 1,466,543 | 8% |
-| **ToonDB WAL** | 1,181,188 | 7% |
+| **SochDB Memory** | 1,466,543 | 8% |
+| **SochDB WAL** | 1,181,188 | 7% |
 
-### Why ToonDB Reads are Slower
+### Why SochDB Reads are Slower
 
-| Factor | SQLite | ToonDB |
+| Factor | SQLite | SochDB |
 |--------|--------|--------|
 | **Row Format** | Contiguous B-tree pages | HashMap per row |
 | **Cache Locality** | Excellent | Poor (pointer chasing) |
@@ -66,7 +66,7 @@ ToonDB WAL      ██████████████████░░░�
 | **SQLite Memory** | 1,786,924 |
 | **SQLite File** | 307,541 |
 
-*Note: ToonDB point lookup not yet benchmarked*
+*Note: SochDB point lookup not yet benchmarked*
 
 ---
 
@@ -89,9 +89,9 @@ ToonDB WAL      ██████████████████░░░�
 |----------|-----|------|-------|-------|
 | **SQLite File** | 1.44M | 1.49M | 1.64M | ↑ Scales well |
 | **SQLite Memory** | 1.93M | 2.07M | 2.12M | ↑ Scales well |
-| **ToonDB WAL** | 0.70M | 1.13M | 0.96M | ~ Variable |
-| **ToonDB Memory** | 1.59M | 1.82M | 1.36M | ↓ Drops at scale |
-| **ToonDB Fast** | 1.09M | 1.47M | 1.28M | ~ Variable |
+| **SochDB WAL** | 0.70M | 1.13M | 0.96M | ~ Variable |
+| **SochDB Memory** | 1.59M | 1.82M | 1.36M | ↓ Drops at scale |
+| **SochDB Fast** | 1.09M | 1.47M | 1.28M | ~ Variable |
 
 ### Scalability Chart
 
@@ -100,9 +100,9 @@ ToonDB WAL      ██████████████████░░░�
               │          │          │
 SQLite Mem    ████████   █████████  ██████████  (stable ~2M)
 SQLite File   ██████     ███████    ████████    (stable ~1.5M)
-ToonDB Mem    ███████    █████████  ███████     (peaks at 10K)
-ToonDB Fast   █████      ███████    ██████      (peaks at 10K)
-ToonDB WAL    ███        █████      ████        (peaks at 10K)
+SochDB Mem    ███████    █████████  ███████     (peaks at 10K)
+SochDB Fast   █████      ███████    ██████      (peaks at 10K)
+SochDB WAL    ███        █████      ████        (peaks at 10K)
 ```
 
 ---
@@ -112,20 +112,20 @@ ToonDB WAL    ███        █████      ████        (peaks a
 ### Performance Gaps
 
 1. **Insert Gap (22-42%)**
-   - ToonDB Memory: 64% of SQLite Memory
-   - ToonDB Fast: 78% of SQLite File
-   - ToonDB WAL: 58% of SQLite File
+   - SochDB Memory: 64% of SQLite Memory
+   - SochDB Fast: 78% of SQLite File
+   - SochDB WAL: 58% of SQLite File
 
 2. **Read Gap (12x)**
-   - ToonDB: ~1.5M ops/sec
+   - SochDB: ~1.5M ops/sec
    - SQLite: ~17.8M ops/sec
    - **Root cause:** HashMap per row vs contiguous B-tree pages
 
 3. **Scalability**
-   - ToonDB performance peaks at 10K records, then drops
+   - SochDB performance peaks at 10K records, then drops
    - SQLite maintains or improves at scale
 
-### ToonDB Bottlenecks
+### SochDB Bottlenecks
 
 | Component | Overhead (ns/op) |
 |-----------|-----------------|
@@ -137,11 +137,11 @@ ToonDB WAL    ███        █████      ████        (peaks a
 
 ---
 
-## ✅ ToonDB Advantages
+## ✅ SochDB Advantages
 
-Despite raw performance gaps, ToonDB offers:
+Despite raw performance gaps, SochDB offers:
 
-| Feature | SQLite | ToonDB |
+| Feature | SQLite | SochDB |
 |---------|--------|--------|
 | **Concurrent Writers** | ❌ Single-writer lock | ✅ Lock-free multi-writer |
 | **MVCC Isolation** | ❌ Table-level locks | ✅ SSI (Serializable Snapshot) |
@@ -157,7 +157,7 @@ Despite raw performance gaps, ToonDB offers:
 - `journal_mode = WAL`
 - `synchronous = NORMAL`
 
-### ToonDB Settings
+### SochDB Settings
 - `group_commit = false`
 - `enable_ordered_index = false` (Fast Mode)
 
@@ -166,16 +166,16 @@ Despite raw performance gaps, ToonDB offers:
 ## 🎯 Recommendations
 
 ### For High Insert Performance
-1. Use **ToonDB Fast Mode** (78% of SQLite)
+1. Use **SochDB Fast Mode** (78% of SQLite)
 2. Disable ordered index
 3. Use single large transactions
 
 ### For High Read Performance
 1. **Use SQLite** for read-heavy workloads
-2. Wait for ToonDB columnar storage optimization
+2. Wait for SochDB columnar storage optimization
 
 ### For Concurrency
-1. Use **ToonDB** for multi-writer scenarios
+1. Use **SochDB** for multi-writer scenarios
 2. SQLite single-writer lock becomes bottleneck
 
 ---
@@ -186,36 +186,36 @@ Despite raw performance gaps, ToonDB offers:
 ```
 SQLite File:    Insert 1.44M, Scan 15.1M, Lookup 445K
 SQLite Memory:  Insert 1.93M, Scan 16.9M, Lookup 1.71M
-ToonDB WAL:     Insert 0.70M, Scan 0.93M
-ToonDB Memory:  Insert 1.59M, Scan 0.92M
-ToonDB Fast:    Insert 1.09M
+SochDB WAL:     Insert 0.70M, Scan 0.93M
+SochDB Memory:  Insert 1.59M, Scan 0.92M
+SochDB Fast:    Insert 1.09M
 ```
 
 ### 10K Records
 ```
 SQLite File:    Insert 1.49M, Scan 15.7M, Lookup 324K
 SQLite Memory:  Insert 2.07M, Scan 16.7M, Lookup 1.83M
-ToonDB WAL:     Insert 1.13M, Scan 1.56M
-ToonDB Memory:  Insert 1.82M, Scan 1.55M
-ToonDB Fast:    Insert 1.47M
+SochDB WAL:     Insert 1.13M, Scan 1.56M
+SochDB Memory:  Insert 1.82M, Scan 1.55M
+SochDB Fast:    Insert 1.47M
 ```
 
 ### 100K Records
 ```
 SQLite File:    Insert 1.64M, Scan 17.8M, Lookup 308K
 SQLite Memory:  Insert 2.12M, Scan 17.6M, Lookup 1.79M
-ToonDB WAL:     Insert 0.96M, Scan 1.18M
-ToonDB Memory:  Insert 1.36M, Scan 1.47M
-ToonDB Fast:    Insert 1.28M
+SochDB WAL:     Insert 0.96M, Scan 1.18M
+SochDB Memory:  Insert 1.36M, Scan 1.47M
+SochDB Fast:    Insert 1.28M
 ```
 
 ---
 
-*Generated by ToonDB Benchmark Suite v1.0*
+*Generated by SochDB Benchmark Suite v1.0*
 
 ---
 
-# 🔍 Vector Search Benchmark: ToonDB vs ChromaDB
+# 🔍 Vector Search Benchmark: SochDB vs ChromaDB
 
 **Date:** December 27, 2024  
 **Test Size:** 10,000 vectors, 128 dimensions  
@@ -225,11 +225,11 @@ ToonDB Fast:    Insert 1.28M
 
 ## 📊 Executive Summary
 
-| Metric | ToonDB | ChromaDB | Winner |
+| Metric | SochDB | ChromaDB | Winner |
 |--------|--------|----------|--------|
 | **Insert** | 655 vec/sec | 10,630 vec/sec | ChromaDB (16x) |
 | **Search Latency (avg)** | 0.874ms | 0.807ms | ~Equal |
-| **Search Latency (p50)** | 0.608ms | 0.711ms | ToonDB (15% faster) |
+| **Search Latency (p50)** | 0.608ms | 0.711ms | SochDB (15% faster) |
 | **Search Latency (p99)** | 5.094ms | 4.711ms | ~Equal |
 | **QPS** | 1,144 | 1,239 | ~Equal |
 
@@ -239,16 +239,16 @@ ToonDB Fast:    Insert 1.28M
 
 ### 1. Python SDK Vector Search Support
 
-**Problem:** ToonDB Python SDK only supported KV operations, not vector search.
+**Problem:** SochDB Python SDK only supported KV operations, not vector search.
 
 **Solution:** Added FFI bindings for HNSW vector index.
 
 **Files Modified:**
-- `toondb-index/src/ffi.rs` - Added C FFI for HNSW
-- `toondb-index/src/lib.rs` - Exported FFI module
-- `toondb-index/Cargo.toml` - Added `cdylib` crate type
-- `toondb-python-sdk/src/toondb/vector.py` - Python bindings
-- `toondb-python-sdk/src/toondb/__init__.py` - Exported VectorIndex
+- `sochdb-index/src/ffi.rs` - Added C FFI for HNSW
+- `sochdb-index/src/lib.rs` - Exported FFI module
+- `sochdb-index/Cargo.toml` - Added `cdylib` crate type
+- `sochdb-python-sdk/src/sochdb/vector.py` - Python bindings
+- `sochdb-python-sdk/src/sochdb/__init__.py` - Exported VectorIndex
 
 **Code Added:**
 ```rust
@@ -346,13 +346,13 @@ def insert_batch(self, ids: np.ndarray, vectors: np.ndarray) -> int:
 
 ---
 
-### 4. Why ToonDB Insert is Still Slower (655 vs 10,630 vec/sec)
+### 4. Why SochDB Insert is Still Slower (655 vs 10,630 vec/sec)
 
 **Root Cause:** Algorithmic overhead, not FFI.
 
-ToonDB's HNSW provides stronger consistency guarantees:
+SochDB's HNSW provides stronger consistency guarantees:
 
-| Feature | ToonDB HNSW | ChromaDB (hnswlib) |
+| Feature | SochDB HNSW | ChromaDB (hnswlib) |
 |---------|-------------|-------------------|
 | **Thread Safety** | Per-layer RwLock | Global lock |
 | **Version Counters** | Yes (TOCTOU-safe) | No |
@@ -360,7 +360,7 @@ ToonDB's HNSW provides stronger consistency guarantees:
 | **Quantization** | I8/F16/F32 support | F32 only |
 | **External Storage** | Memory-mapped option | In-memory only |
 
-**Trade-off:** ToonDB sacrifices insert throughput for:
+**Trade-off:** SochDB sacrifices insert throughput for:
 - Correct concurrent updates
 - Better consistency under contention
 - More flexible storage options
@@ -376,7 +376,7 @@ Search: 0.807ms avg, 0.711ms p50, 4.711ms p99
 QPS: 1,239
 ```
 
-### ToonDB (Rust HNSW via Python FFI)
+### SochDB (Rust HNSW via Python FFI)
 ```
 Insert (batch): 15.258s (655 vec/sec)
 Search: 0.874ms avg, 0.608ms p50, 5.094ms p99
@@ -401,18 +401,18 @@ results = index.search(vectors[0], k=5)
 
 ### For Insert-Heavy Workloads
 - Use **ChromaDB** (16x faster insert)
-- Or use ToonDB's bulk-load modes (`lockfree_hnsw`, `hnsw_parallel`)
+- Or use SochDB's bulk-load modes (`lockfree_hnsw`, `hnsw_parallel`)
 
 ### For Search-Heavy Workloads  
-- **ToonDB and ChromaDB are equivalent** (~0.8ms latency)
-- ToonDB has better p50 latency (0.608ms vs 0.711ms)
+- **SochDB and ChromaDB are equivalent** (~0.8ms latency)
+- SochDB has better p50 latency (0.608ms vs 0.711ms)
 
 ### For Concurrent Access
-- Use **ToonDB** (thread-safe HNSW with per-layer locking)
+- Use **SochDB** (thread-safe HNSW with per-layer locking)
 - ChromaDB's hnswlib uses global lock = bottleneck
 
 ### For Memory-Constrained Systems
-- Use **ToonDB** with `with_storage()` for memory-mapped vectors
+- Use **SochDB** with `with_storage()` for memory-mapped vectors
 - Enables 10M+ vectors on 16GB machines
 
 ---
@@ -421,12 +421,12 @@ results = index.search(vectors[0], k=5)
 
 | File | Changes |
 |------|---------|
-| `toondb-index/src/ffi.rs` | New FFI module for HNSW (260 lines) |
-| `toondb-index/src/lib.rs` | Export FFI module |
-| `toondb-index/Cargo.toml` | Add `cdylib` crate type |
-| `toondb-python-sdk/src/toondb/vector.py` | VectorIndex class (307 lines) |
-| `toondb-python-sdk/src/toondb/__init__.py` | Export VectorIndex |
-| `benchmarks/full_headtohead.py` | ToonDB vs ChromaDB benchmark |
+| `sochdb-index/src/ffi.rs` | New FFI module for HNSW (260 lines) |
+| `sochdb-index/src/lib.rs` | Export FFI module |
+| `sochdb-index/Cargo.toml` | Add `cdylib` crate type |
+| `sochdb-python-sdk/src/sochdb/vector.py` | VectorIndex class (307 lines) |
+| `sochdb-python-sdk/src/sochdb/__init__.py` | Export VectorIndex |
+| `benchmarks/full_headtohead.py` | SochDB vs ChromaDB benchmark |
 
 ---
 
@@ -434,11 +434,11 @@ results = index.search(vectors[0], k=5)
 
 ```bash
 # Build the Rust library with FFI
-cargo build --release -p toondb-index
+cargo build --release -p sochdb-index
 
 # Run the benchmark
-TOONDB_LIB_PATH=$(pwd)/target/release \
-PYTHONPATH=$(pwd)/toondb-python-sdk/src \
+SOCHDB_LIB_PATH=$(pwd)/target/release \
+PYTHONPATH=$(pwd)/sochdb-python-sdk/src \
 python3 benchmarks/full_headtohead.py
 ```
 
@@ -457,7 +457,7 @@ python3 benchmarks/full_headtohead.py
 
 ## 📋 Overview
 
-A new unified benchmarking system has been added to ToonDB, providing:
+A new unified benchmarking system has been added to SochDB, providing:
 
 - **Standardized JSON output** (schema v1.0)
 - **Baseline comparison** with regression detection
@@ -479,25 +479,25 @@ A new unified benchmarking system has been added to ToonDB, providing:
 | **Insert Latency p99** | 0.003 ms |
 | **Total Duration** | 0.12 sec |
 
-### ToonDB vs SQLite 360° (100K records, 5 runs)
+### SochDB vs SQLite 360° (100K records, 5 runs)
 
-| Metric | ToonDB | SQLite | Winner |
+| Metric | SochDB | SQLite | Winner |
 |--------|--------|--------|--------|
-| **Insert** | **1,186,634 ops/s** | 919,306 ops/s | **ToonDB (+29%)** ✅ |
+| **Insert** | **1,186,634 ops/s** | 919,306 ops/s | **SochDB (+29%)** ✅ |
 | **Scan** | 2,609,586 rows/s | 18,783,604 rows/s | SQLite (7.2x) |
 
 ---
 
-## 🎉 Key Finding: ToonDB Now Beats SQLite on Inserts!
+## 🎉 Key Finding: SochDB Now Beats SQLite on Inserts!
 
 ```
-ToonDB Insert:  ██████████████████████████████████████  1,186,634 ops/sec
+SochDB Insert:  ██████████████████████████████████████  1,186,634 ops/sec
 SQLite Insert:  █████████████████████████████░░░░░░░░░    919,306 ops/sec
                ─────────────────────────────────────────
-                          ToonDB is 29% FASTER
+                          SochDB is 29% FASTER
 ```
 
-This is a significant improvement from earlier benchmarks where ToonDB was 22-42% slower.
+This is a significant improvement from earlier benchmarks where SochDB was 22-42% slower.
 
 ---
 
@@ -516,7 +516,7 @@ cargo build -p benchmarks --bin perf-run --release
 
 # Run SQLite comparison
 ./target/release/perf-run \
-  --workload benchmarks/workloads/rust/sqlite_vs_toondb_360.toml \
+  --workload benchmarks/workloads/rust/sqlite_vs_sochdb_360.toml \
   --runs 5 --verbose
 ```
 
@@ -545,7 +545,7 @@ benchmarks/
 ├── workloads/               # Benchmark definitions (TOML)
 │   ├── rust/
 │   │   ├── kv_put_scan.toml
-│   │   ├── sqlite_vs_toondb_360.toml
+│   │   ├── sqlite_vs_sochdb_360.toml
 │   │   └── vector_hnsw.toml
 │   └── python/
 │       ├── ffi_kv_vs_sqlite.toml
@@ -557,7 +557,7 @@ benchmarks/
 ├── baselines/               # Reference results by machine
 │   └── mac-studio/
 │       ├── kv_put_scan/default.json
-│       └── sqlite_vs_toondb_360/default.json
+│       └── sqlite_vs_sochdb_360/default.json
 └── reports/
     ├── runs/                # Individual benchmark runs
     └── comparisons/         # Baseline diff reports

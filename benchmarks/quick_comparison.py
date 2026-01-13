@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Quick ToonDB Memory Comparison
+Quick SochDB Memory Comparison
 ===============================
 
 Fast benchmark focusing on key metrics with smaller dataset.
 
 Usage:
-    export TOONDB_LIB_PATH=/path/to/libtoondb_index.so
+    export SOCHDB_LIB_PATH=/path/to/libsochdb_index.so
     python3 benchmarks/quick_comparison.py
 """
 
@@ -20,19 +20,19 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from memory_benchmark_harness import BenchmarkConfig
-from adapters.toondb_adapter import ToonDBAdapter
+from adapters.sochdb_adapter import SochDBAdapter
 from workload_generator import SyntheticWorkloadGenerator, QueryGenerator
 
 
 def quick_benchmark():
     """Run quick benchmark with small dataset"""
     print("="*70)
-    print("  QUICK MEMORY SYSTEM BENCHMARK - ToonDB")
+    print("  QUICK MEMORY SYSTEM BENCHMARK - SochDB")
     print("="*70)
 
     # Small config for speed
     config = {
-        "db_path": "/tmp/toondb_quick_bench.db",
+        "db_path": "/tmp/sochdb_quick_bench.db",
         "embedding_dim": 1536,
         "hnsw_m": 16,
         "hnsw_ef_construction": 100,
@@ -40,8 +40,8 @@ def quick_benchmark():
     }
 
     # Initialize adapter
-    print("\n✓ Initializing ToonDB adapter...")
-    adapter = ToonDBAdapter(config)
+    print("\n✓ Initializing SochDB adapter...")
+    adapter = SochDBAdapter(config)
     adapter.reset()
 
     # Phase 1: Microbenchmark

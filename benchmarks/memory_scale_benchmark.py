@@ -89,7 +89,7 @@ class HNSWMemory:
     """HNSW O(log n) vector search - the solution"""
 
     def __init__(self, client: AzureOpenAI, config: Config):
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
 
         self.client = client
         self.config = config

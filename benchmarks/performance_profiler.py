@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB Performance Profiler
+SochDB Performance Profiler
 ===========================
 Detailed profiling of insert and search operations to identify bottlenecks.
 """
@@ -20,7 +20,7 @@ import numpy as np
 
 def profile_vector_insert():
     """Profile vector insert operations"""
-    from toondb import VectorIndex
+    from sochdb import VectorIndex
     
     results = {}
     
@@ -64,7 +64,7 @@ def profile_vector_insert():
 
 def profile_vector_search():
     """Profile search operations"""
-    from toondb import VectorIndex
+    from sochdb import VectorIndex
     
     results = {}
     
@@ -111,11 +111,11 @@ def profile_chromadb_comparison():
     """Compare with ChromaDB"""
     try:
         import chromadb
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
     except ImportError:
         return {"error": "chromadb not installed"}
     
-    results = {"toondb": {}, "chromadb": {}}
+    results = {"sochdb": {}, "chromadb": {}}
     
     dim = 768
     n = 5000
@@ -123,7 +123,7 @@ def profile_chromadb_comparison():
     np.random.seed(42)
     vectors = np.random.randn(n, dim).astype(np.float32)
     
-    # ToonDB with ef=48 (fair comparison)
+    # SochDB with ef=48 (fair comparison)
     index = VectorIndex(dimension=dim, max_connections=16, ef_construction=48)
     ids = np.arange(n, dtype=np.uint64)
     
@@ -138,7 +138,7 @@ def profile_chromadb_comparison():
         index.search(vectors[i], k=10)
         latencies.append((time.perf_counter() - start) * 1000)
     
-    results["toondb"] = {
+    results["sochdb"] = {
         "insert_rate": n / toon_insert,
         "search_p50_ms": float(np.percentile(latencies, 50)),
     }
@@ -163,8 +163,8 @@ def profile_chromadb_comparison():
     }
     
     results["comparison"] = {
-        "insert_ratio": results["toondb"]["insert_rate"] / results["chromadb"]["insert_rate"],
-        "search_ratio": results["chromadb"]["search_p50_ms"] / results["toondb"]["search_p50_ms"],
+        "insert_ratio": results["sochdb"]["insert_rate"] / results["chromadb"]["insert_rate"],
+        "search_ratio": results["chromadb"]["search_p50_ms"] / results["sochdb"]["search_p50_ms"],
     }
     
     return results
@@ -173,13 +173,13 @@ def profile_chromadb_comparison():
 def generate_report(insert_results, search_results, comparison):
     """Generate markdown report"""
     
-    report = f"""# ToonDB Performance Profiling Report
+    report = f"""# SochDB Performance Profiling Report
 
 Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 ## Executive Summary
 
-ToonDB performance analysis with detailed profiling of insert and search operations.
+SochDB performance analysis with detailed profiling of insert and search operations.
 
 ---
 
@@ -222,16 +222,16 @@ ToonDB performance analysis with detailed profiling of insert and search operati
     report += """
 ---
 
-## 3. ToonDB vs ChromaDB (768D, 5K vectors, ef=48)
+## 3. SochDB vs ChromaDB (768D, 5K vectors, ef=48)
 
 """
     
     if "error" not in comparison:
-        t = comparison["toondb"]
+        t = comparison["sochdb"]
         c = comparison["chromadb"]
         comp = comparison["comparison"]
         
-        report += f"""| Metric | ToonDB | ChromaDB | Ratio |
+        report += f"""| Metric | SochDB | ChromaDB | Ratio |
 |--------|--------|----------|-------|
 | Insert Rate | {t['insert_rate']:,.0f} vec/s | {c['insert_rate']:,.0f} vec/s | {comp['insert_ratio']:.2f}x |
 | Search (p50) | {t['search_p50_ms']:.2f}ms | {c['search_p50_ms']:.2f}ms | {comp['search_ratio']:.1f}x faster |
@@ -245,7 +245,7 @@ ToonDB performance analysis with detailed profiling of insert and search operati
             report += f"- ⚠️ Insert: {1/comp['insert_ratio']:.1f}x slower than ChromaDB\n"
         
         if comp['search_ratio'] >= 1.0:
-            report += f"- ✅ **Search: ToonDB {comp['search_ratio']:.1f}x FASTER**\n"
+            report += f"- ✅ **Search: SochDB {comp['search_ratio']:.1f}x FASTER**\n"
         else:
             report += f"- ⚠️ Search: {1/comp['search_ratio']:.1f}x slower\n"
     
@@ -275,7 +275,7 @@ ToonDB performance analysis with detailed profiling of insert and search operati
 """
     
     if "error" not in comparison and comparison["comparison"]["insert_ratio"] >= 0.8:
-        report += """✅ **ToonDB achieves parity with ChromaDB** when using matched ef_construction settings.
+        report += """✅ **SochDB achieves parity with ChromaDB** when using matched ef_construction settings.
 
 - Use `ef_construction=48` for balanced insert speed vs recall
 - Use `ef_construction=100` for maximum recall quality
@@ -290,7 +290,7 @@ ToonDB performance analysis with detailed profiling of insert and search operati
 
 def main():
     print("=" * 70)
-    print("  TOONDB PERFORMANCE PROFILER")
+    print("  SOCHDB PERFORMANCE PROFILER")
     print("=" * 70)
     print()
     
@@ -304,7 +304,7 @@ def main():
     comparison = profile_chromadb_comparison()
     
     if "error" not in comparison:
-        print(f"    ToonDB Insert: {comparison['toondb']['insert_rate']:,.0f} vec/s")
+        print(f"    SochDB Insert: {comparison['sochdb']['insert_rate']:,.0f} vec/s")
         print(f"    ChromaDB Insert: {comparison['chromadb']['insert_rate']:,.0f} vec/s")
         print(f"    Insert Ratio: {comparison['comparison']['insert_ratio']:.2f}x")
         print(f"    Search Speedup: {comparison['comparison']['search_ratio']:.1f}x")

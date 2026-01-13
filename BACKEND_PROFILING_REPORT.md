@@ -1,4 +1,4 @@
-# ToonDB Backend Profiling Report
+# SochDB Backend Profiling Report
 
 **Generated:** 2025-12-28 17:30
 
@@ -57,4 +57,4 @@
 
 ## Conclusion
 
-**ToonDB's Rust core performs well.** The 12x gap between Rust and Python is due to FFI overhead, not algorithmic issues. For production bulk inserts, use the Rust API directly or implement zero-copy FFI bindings.
+**SochDB's Rust core performs well.** The 12x gap between Rust and Python is due to FFI overhead, not algorithmic issues. For production bulk inserts, use the Rust API directly or implement zero-copy FFI bindings.

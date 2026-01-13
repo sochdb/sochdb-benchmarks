@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-On-Disk Vector DB Benchmark: ToonDB vs LanceDB vs Qdrant vs ChromaDB
+On-Disk Vector DB Benchmark: SochDB vs LanceDB vs Qdrant vs ChromaDB
 
 Tests on-disk performance characteristics:
 1. Large-scale indexing (50K-100K vectors)
@@ -9,7 +9,7 @@ Tests on-disk performance characteristics:
 4. Cold-start query latency
 
 Usage:
-    PYTHONPATH=toondb-python-sdk/src TOONDB_LIB_PATH=target/release python3 benchmarks/ondisk_benchmark.py
+    PYTHONPATH=sochdb-python-sdk/src SOCHDB_LIB_PATH=target/release python3 benchmarks/ondisk_benchmark.py
 """
 
 import os
@@ -27,13 +27,13 @@ import numpy as np
 # Database Adapters
 # =============================================================================
 
-class ToonDBAdapter:
-    """ToonDB - Rust HNSW with mmap support."""
+class SochDBAdapter:
+    """SochDB - Rust HNSW with mmap support."""
     
-    name = "ToonDB"
+    name = "SochDB"
     
     def __init__(self, dimension: int, tmp_dir: str):
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         self.index = VectorIndex(dimension=dimension, max_connections=16, ef_construction=100)
         self.dimension = dimension
         self.count = 0
@@ -268,15 +268,15 @@ def run_scale_benchmark(adapters_classes: List, dimension: int, num_vectors: int
 def main():
     print("="*70)
     print("  ON-DISK VECTOR DATABASE BENCHMARK")
-    print("  ToonDB vs LanceDB vs Qdrant vs ChromaDB")
+    print("  SochDB vs LanceDB vs Qdrant vs ChromaDB")
     print("="*70)
     print("\n  Testing on-disk storage characteristics:")
     print("  - LanceDB: Disk-first Lance format")
     print("  - Qdrant: mmap with on_disk=True")
     print("  - ChromaDB: DuckDB+Parquet persistence")
-    print("  - ToonDB: In-memory HNSW (baseline)")
+    print("  - SochDB: In-memory HNSW (baseline)")
     
-    adapters = [ToonDBAdapter, LanceDBAdapter, QdrantAdapter, ChromaDBAdapter]
+    adapters = [SochDBAdapter, LanceDBAdapter, QdrantAdapter, ChromaDBAdapter]
     
     all_results = {}
     
@@ -297,13 +297,13 @@ def main():
     print("="*70)
     
     print("\n{:<15} {:>12} {:>12} {:>12} {:>12}".format(
-        "Scale", "ToonDB", "LanceDB", "Qdrant", "ChromaDB"
+        "Scale", "SochDB", "LanceDB", "Qdrant", "ChromaDB"
     ))
     print("-"*70)
     
     for scale_key, results in all_results.items():
         row = [scale_key]
-        for db in ["ToonDB", "LanceDB", "Qdrant", "ChromaDB"]:
+        for db in ["SochDB", "LanceDB", "Qdrant", "ChromaDB"]:
             if db in results and "search_avg_ms" in results[db]:
                 row.append(f"{results[db]['search_avg_ms']:.2f}")
             else:
@@ -316,13 +316,13 @@ def main():
     print("="*70)
     
     print("\n{:<15} {:>12} {:>12} {:>12} {:>12}".format(
-        "Scale", "ToonDB", "LanceDB", "Qdrant", "ChromaDB"
+        "Scale", "SochDB", "LanceDB", "Qdrant", "ChromaDB"
     ))
     print("-"*70)
     
     for scale_key, results in all_results.items():
         row = [scale_key]
-        for db in ["ToonDB", "LanceDB", "Qdrant", "ChromaDB"]:
+        for db in ["SochDB", "LanceDB", "Qdrant", "ChromaDB"]:
             if db in results and "insert_rate" in results[db]:
                 row.append(f"{results[db]['insert_rate']:,.0f}")
             else:
@@ -338,7 +338,7 @@ def main():
     print("  - LanceDB: Best for 100GB+ datasets, disk-first architecture")
     print("  - Qdrant: Best for production deployments, mmap support")
     print("  - ChromaDB: Easy to use, good for prototyping")
-    print("  - ToonDB: Fastest in-memory, ideal for latency-critical apps")
+    print("  - SochDB: Fastest in-memory, ideal for latency-critical apps")
     
     print("\n  ✓ On-disk benchmark completed!")
     print("="*70)

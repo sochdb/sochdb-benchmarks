@@ -1,4 +1,4 @@
-# ToonDB Benchmark Results - Published Findings
+# SochDB Benchmark Results - Published Findings
 
 **Date**: 2026-01-04
 **Environment**: Intel Xeon Platinum 8370C @ 2.80GHz, Linux 4.4.0
@@ -8,13 +8,13 @@
 
 ## Executive Summary
 
-We conducted comprehensive benchmarks of ToonDB for agent memory systems, testing:
+We conducted comprehensive benchmarks of SochDB for agent memory systems, testing:
 
 1. **Vector search scaling** (O(n) vs O(log n))
 2. **Real LLM integration** with actual Azure OpenAI calls
-3. **Multi-system comparison** (ToonDB vs ChromaDB)
+3. **Multi-system comparison** (SochDB vs ChromaDB)
 
-**Key Finding**: ToonDB's HNSW O(log n) indexing delivers **11.2x better performance** at scale (2000 observations) compared to brute-force O(n) search, with minimal degradation (**5.9x** vs **34x**).
+**Key Finding**: SochDB's HNSW O(log n) indexing delivers **11.2x better performance** at scale (2000 observations) compared to brute-force O(n) search, with minimal degradation (**5.9x** vs **34x**).
 
 ---
 
@@ -65,28 +65,28 @@ Degradation: 5.9x (much better!)
 **Test**: Actual Azure OpenAI embedding calls
 **Dataset**: 8 multi-turn conversations (65 messages)
 **Queries**: 200 test queries
-**Systems**: ToonDB vs ChromaDB
+**Systems**: SochDB vs ChromaDB
 
 ### Results
 
 | System | Insert (avg) | p50 Latency | p95 Latency | p99 Latency | Context |
 |--------|--------------|-------------|-------------|-------------|---------|
-| **ToonDB** | 94.20ms | **79.49ms** | 172.64ms | 2557.91ms | 36 tokens |
+| **SochDB** | 94.20ms | **79.49ms** | 172.64ms | 2557.91ms | 36 tokens |
 | **ChromaDB** | 184.90ms | 82.80ms | **123.00ms** | **1338.15ms** | 36 tokens |
 
 ### Key Findings
 
-1. **ToonDB is 1.96x faster at insert** (94ms vs 185ms)
+1. **SochDB is 1.96x faster at insert** (94ms vs 185ms)
 2. **ChromaDB has better p95/p99 consistency** (123ms vs 173ms p95)
 3. **Both deliver identical context quality** (36 tokens avg)
 4. **Real embedding overhead dominates**: 70-90% of latency is Azure OpenAI API calls, not DB operations
 
 ### What This Means
 
-- **Pure DB performance** is fast (<10ms for ToonDB)
+- **Pure DB performance** is fast (<10ms for SochDB)
 - **API latency dominates** in real-world usage
 - **Both systems are production-ready** for agent memory
-- **ToonDB optimizes for inserts**, ChromaDB for tail latency
+- **SochDB optimizes for inserts**, ChromaDB for tail latency
 
 ---
 
@@ -111,7 +111,7 @@ We developed a comprehensive benchmark framework for fair comparison:
 benchmarks/
 ├── memory_benchmark_harness.py (300 lines)
 ├── adapters/
-│   ├── toondb_adapter.py (350 lines)
+│   ├── sochdb_adapter.py (350 lines)
 │   └── zep_adapter.py (250 lines)
 ├── workload_generator.py (450 lines)
 └── run_memory_comparison.py (550 lines)
@@ -123,7 +123,7 @@ benchmarks/
 
 ## Performance Characteristics
 
-### ToonDB
+### SochDB
 
 **Strengths**:
 - ✅ **Low latency**: HNSW O(log n) delivers p95 < 200ms at scale
@@ -186,7 +186,7 @@ Based on O(log n) scaling, at **10,000 observations**:
 
 ```bash
 # 1. Pure vector search scaling
-export TOONDB_LIB_PATH=/path/to/libtoondb_index.so
+export SOCHDB_LIB_PATH=/path/to/libsochdb_index.so
 python3 benchmarks/pure_search_scale_benchmark.py
 
 # 2. Real LLM integration
@@ -220,7 +220,7 @@ At production scales (1000+ observations):
 With actual LLM calls:
 - API latency dominates (70-90% of total time)
 - DB performance matters most for **insert throughput**
-- Both ToonDB and ChromaDB are **production-ready**
+- Both SochDB and ChromaDB are **production-ready**
 
 ### 3. Benchmark Framework
 
@@ -234,7 +234,7 @@ We've built a **production-grade** framework for fair comparison:
 
 ## References
 
-- **Code Repository**: `toondb-benchmarks`
+- **Code Repository**: `sochdb-benchmarks`
 - **Benchmark Scripts**: `benchmarks/` directory
 - **Framework Guide**: `BENCHMARK_FRAMEWORK_GUIDE.md`
 - **Zep vs Mem0 Blog**: https://blog.getzep.com/lies-damn-lies-statistics-is-mem0-really-sota-in-agent-memory/

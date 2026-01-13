@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-ToonDB Complete Benchmark & Test Suite
+SochDB Complete Benchmark & Test Suite
 
 Runs all benchmarks and tests, generates a comprehensive report with recommendations.
 
 Usage:
-    PYTHONPATH=toondb-python-sdk/src TOONDB_LIB_PATH=target/release python3 benchmarks/full_benchmark_suite.py
+    PYTHONPATH=sochdb-python-sdk/src SOCHDB_LIB_PATH=target/release python3 benchmarks/full_benchmark_suite.py
 """
 
 import os
@@ -26,7 +26,7 @@ import numpy as np
 
 def test_self_retrieval() -> Tuple[bool, Dict]:
     """Test that exact vectors can be retrieved."""
-    from toondb import VectorIndex
+    from sochdb import VectorIndex
     
     dim = 128
     num_vectors = 100
@@ -69,7 +69,7 @@ def test_self_retrieval() -> Tuple[bool, Dict]:
 
 def test_recall_at_k() -> Tuple[bool, Dict]:
     """Test Recall@10 vs brute force."""
-    from toondb import VectorIndex
+    from sochdb import VectorIndex
     
     dim = 128
     num_vectors = 1000
@@ -116,7 +116,7 @@ def test_recall_at_k() -> Tuple[bool, Dict]:
 
 def benchmark_latency() -> Dict:
     """Benchmark search latency."""
-    from toondb import VectorIndex
+    from sochdb import VectorIndex
     
     dim = 128
     num_vectors = 10000
@@ -151,7 +151,7 @@ def benchmark_latency() -> Dict:
 
 def benchmark_insert() -> Dict:
     """Benchmark insert throughput."""
-    from toondb import VectorIndex
+    from sochdb import VectorIndex
     
     dim = 128
     num_vectors = 10000
@@ -175,7 +175,7 @@ def benchmark_insert() -> Dict:
 
 def benchmark_qps() -> Dict:
     """Benchmark queries per second."""
-    from toondb import VectorIndex
+    from sochdb import VectorIndex
     
     dim = 128
     num_vectors = 10000
@@ -217,7 +217,7 @@ def compare_with_chromadb() -> Dict:
     """Compare with ChromaDB."""
     try:
         import chromadb
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         
         dim = 128
         num_vectors = 5000
@@ -227,19 +227,19 @@ def compare_with_chromadb() -> Dict:
         vectors = np.random.randn(num_vectors, dim).astype(np.float32)
         queries = np.random.randn(num_queries, dim).astype(np.float32)
         
-        # ToonDB
-        toondb_index = VectorIndex(dimension=dim, max_connections=16, ef_construction=100)
+        # SochDB
+        sochdb_index = VectorIndex(dimension=dim, max_connections=16, ef_construction=100)
         ids = np.arange(num_vectors, dtype=np.uint64)
         
         start = time.perf_counter()
-        toondb_index.insert_batch(ids, vectors)
-        toondb_insert = time.perf_counter() - start
+        sochdb_index.insert_batch(ids, vectors)
+        sochdb_insert = time.perf_counter() - start
         
-        toondb_latencies = []
+        sochdb_latencies = []
         for q in queries:
             start = time.perf_counter()
-            toondb_index.search(q, k=10)
-            toondb_latencies.append((time.perf_counter() - start) * 1000)
+            sochdb_index.search(q, k=10)
+            sochdb_latencies.append((time.perf_counter() - start) * 1000)
         
         # ChromaDB
         client = chromadb.Client()
@@ -259,10 +259,10 @@ def compare_with_chromadb() -> Dict:
             chroma_latencies.append((time.perf_counter() - start) * 1000)
         
         return {
-            "toondb": {
-                "insert_time": toondb_insert,
-                "insert_rate": num_vectors / toondb_insert,
-                "search_p50_ms": float(np.percentile(toondb_latencies, 50)),
+            "sochdb": {
+                "insert_time": sochdb_insert,
+                "insert_rate": num_vectors / sochdb_insert,
+                "search_p50_ms": float(np.percentile(sochdb_latencies, 50)),
             },
             "chromadb": {
                 "insert_time": chroma_insert,
@@ -270,8 +270,8 @@ def compare_with_chromadb() -> Dict:
                 "search_p50_ms": float(np.percentile(chroma_latencies, 50)),
             },
             "speedup": {
-                "insert": chroma_insert / toondb_insert,
-                "search": np.percentile(chroma_latencies, 50) / np.percentile(toondb_latencies, 50),
+                "insert": chroma_insert / sochdb_insert,
+                "search": np.percentile(chroma_latencies, 50) / np.percentile(sochdb_latencies, 50),
             }
         }
     except ImportError:
@@ -284,7 +284,7 @@ def compare_with_chromadb() -> Dict:
 
 def main():
     print("=" * 80)
-    print("  TOONDB COMPLETE BENCHMARK & TEST SUITE")
+    print("  SOCHDB COMPLETE BENCHMARK & TEST SUITE")
     print("=" * 80)
     print(f"  Started: {time.strftime('%Y-%m-%d %H:%M:%S')}")
     
@@ -343,14 +343,14 @@ def main():
     print("  SECTION 3: COMPETITOR COMPARISON")
     print("=" * 80)
     
-    print("\n  [3.1] ToonDB vs ChromaDB...")
+    print("\n  [3.1] SochDB vs ChromaDB...")
     data = compare_with_chromadb()
     results["vs_chromadb"] = data
     if "error" not in data:
-        print(f"        ToonDB Insert: {data['toondb']['insert_rate']:,.0f} vec/s")
+        print(f"        SochDB Insert: {data['sochdb']['insert_rate']:,.0f} vec/s")
         print(f"        ChromaDB Insert: {data['chromadb']['insert_rate']:,.0f} vec/s")
         print(f"        Insert Speedup: {data['speedup']['insert']:.1f}x")
-        print(f"        ToonDB Search: {data['toondb']['search_p50_ms']:.3f}ms")
+        print(f"        SochDB Search: {data['sochdb']['search_p50_ms']:.3f}ms")
         print(f"        ChromaDB Search: {data['chromadb']['search_p50_ms']:.3f}ms")
         print(f"        Search Speedup: {data['speedup']['search']:.1f}x")
     else:
@@ -404,8 +404,8 @@ def main():
   issue that makes all performance numbers meaningless.
 
   Root Cause Investigation Needed:
-  1. Check toondb-index/src/hnsw.rs - graph connectivity during parallel insert
-  2. Check toondb-index/src/ffi.rs - batch insert FFI correctness
+  1. Check sochdb-index/src/hnsw.rs - graph connectivity during parallel insert
+  2. Check sochdb-index/src/ffi.rs - batch insert FFI correctness
   3. Verify entry point selection in search algorithm
   4. Check for race conditions in concurrent operations
 
@@ -429,9 +429,9 @@ def main():
     if "error" not in results.get("vs_chromadb", {}):
         speedup = results["vs_chromadb"]["speedup"]["search"]
         if speedup > 1:
-            print(f"\n  ✓ ToonDB is {speedup:.1f}x faster than ChromaDB on search latency")
+            print(f"\n  ✓ SochDB is {speedup:.1f}x faster than ChromaDB on search latency")
         else:
-            print(f"\n  ⚠ ToonDB is {1/speedup:.1f}x slower than ChromaDB on search latency")
+            print(f"\n  ⚠ SochDB is {1/speedup:.1f}x slower than ChromaDB on search latency")
     
     print("\n" + "=" * 80)
     print(f"  Completed: {time.strftime('%Y-%m-%d %H:%M:%S')}")

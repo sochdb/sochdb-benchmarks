@@ -1,9 +1,9 @@
-# ToonDB KV Put/Scan Benchmark Workload
+# SochDB KV Put/Scan Benchmark Workload
 # Tests basic key-value insert and scan operations
 
 [workload]
 name = "kv_put_scan"
-description = "Measures ToonDB KV insert throughput and full-table scan performance"
+description = "Measures SochDB KV insert throughput and full-table scan performance"
 runner = "rust"
 binary = "perf-run"
 

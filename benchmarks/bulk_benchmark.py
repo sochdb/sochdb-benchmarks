@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB Bulk Ingest Performance Benchmark
+SochDB Bulk Ingest Performance Benchmark
 
 This benchmark measures throughput for the Bulk API and compares it against
 the Python FFI path to detect performance regressions.
@@ -97,9 +97,9 @@ def benchmark_bulk_cli(
     
     # Import here to avoid import errors if bulk not available
     try:
-        from toondb import bulk_build_index, get_toondb_bulk_path
+        from sochdb import bulk_build_index, get_sochdb_bulk_path
         # Verify binary exists
-        get_toondb_bulk_path()
+        get_sochdb_bulk_path()
     except (ImportError, RuntimeError) as e:
         return BenchResult(
             name=name,
@@ -145,7 +145,7 @@ def benchmark_ffi_insert(
     
     # Try to import VectorIndex
     try:
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
     except ImportError:
         return BenchResult(
             name=name,
@@ -205,7 +205,7 @@ def run_benchmark_suite(
     n = TEST_SIZES[size]
     results = []
     
-    with tempfile.TemporaryDirectory(prefix="toondb_bench_") as tmpdir:
+    with tempfile.TemporaryDirectory(prefix="sochdb_bench_") as tmpdir:
         output_dir = Path(tmpdir)
         
         for d in dimensions:
@@ -306,7 +306,7 @@ def save_results(results: list[BenchResult], path: Path) -> None:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="ToonDB Bulk Ingest Benchmark")
+    parser = argparse.ArgumentParser(description="SochDB Bulk Ingest Benchmark")
     parser.add_argument("--ci", action="store_true", 
                        help="CI mode: exit 1 on regression")
     parser.add_argument("--size", choices=TEST_SIZES.keys(), default=DEFAULT_SIZE,
@@ -323,7 +323,7 @@ def main() -> int:
     args = parser.parse_args()
     
     print("="*60)
-    print("ToonDB Bulk Ingest Performance Benchmark")
+    print("SochDB Bulk Ingest Performance Benchmark")
     print("="*60)
     print(f"Platform: {platform.system()} {platform.machine()}")
     print(f"Python: {platform.python_version()}")

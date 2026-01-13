@@ -1,9 +1,9 @@
-# ToonDB Vector HNSW Benchmark Workload
+# SochDB Vector HNSW Benchmark Workload
 # Tests vector insertion and nearest-neighbor search performance
 
 [workload]
 name = "vector_hnsw"
-description = "Measures ToonDB HNSW vector index insert and search performance"
+description = "Measures SochDB HNSW vector index insert and search performance"
 runner = "rust"
 binary = "perf-run"
 

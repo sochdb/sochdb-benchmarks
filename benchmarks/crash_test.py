@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Transactional Integrity Test ("Jepsen-lite")
-Verifies that ToonDB remains consistent after a process crash (kill -9).
+Verifies that SochDB remains consistent after a process crash (kill -9).
 
 Scenario:
 1. Writer process continually increments a counter in the DB.
@@ -19,18 +19,18 @@ import argparse
 from typing import Optional
 
 try:
-    import toondb
+    import sochdb
 except ImportError:
-    print("ToonDB not installed. Skipping crash test.")
+    print("SochDB not installed. Skipping crash test.")
     sys.exit(0)
 
-DB_PATH = "/tmp/toondb_crash_test"
+DB_PATH = "/tmp/sochdb_crash_test"
 COUNTER_KEY = b"crash_counter"
 
 def writer_process(path: str, interval: float = 0.001):
     """Continuously updates a counter in the DB."""
     try:
-        db = toondb.Database.open(path)
+        db = sochdb.Database.open(path)
         i = 0
         print(f"[Writer] Started at {path}")
         while True:
@@ -75,7 +75,7 @@ def run_crash_test():
     try:
         # Re-open DB. This should trigger WAL recovery if implemented.
         start_time = time.perf_counter()
-        db = toondb.Database.open(DB_PATH)
+        db = sochdb.Database.open(DB_PATH)
         recovery_time = (time.perf_counter() - start_time) * 1000
         
         val = db.get(COUNTER_KEY)

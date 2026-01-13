@@ -44,7 +44,7 @@
     }
   },
   "comparison": {
-    "toondb": {
+    "sochdb": {
       "insert_rate": 126.96192826088848,
       "search_p50_ms": 2.950374499988584
     },

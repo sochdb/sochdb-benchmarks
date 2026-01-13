@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Real-World Use Case Benchmark: ToonDB vs ChromaDB vs LanceDB
+Real-World Use Case Benchmark: SochDB vs ChromaDB vs LanceDB
 
 Compares performance on production-like scenarios:
 1. Customer Support RAG (multi-tenant, filtering)
@@ -9,7 +9,7 @@ Compares performance on production-like scenarios:
 4. Code Search (hybrid ranking)
 
 Usage:
-    PYTHONPATH=toondb-python-sdk/src TOONDB_LIB_PATH=target/release python3 benchmarks/realworld_comparison.py
+    PYTHONPATH=sochdb-python-sdk/src SOCHDB_LIB_PATH=target/release python3 benchmarks/realworld_comparison.py
 """
 
 import os
@@ -70,11 +70,11 @@ class EmbeddingClient:
 # Database Adapters
 # =============================================================================
 
-class ToonDBAdapter:
-    """ToonDB vector search adapter."""
+class SochDBAdapter:
+    """SochDB vector search adapter."""
     
     def __init__(self, dimension: int):
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         self.index = VectorIndex(dimension=dimension, max_connections=32, ef_construction=200)
         self.metadata: Dict[int, Dict] = {}
         self.next_id = 0
@@ -436,7 +436,7 @@ def run_code_search_benchmark(embed_client: EmbeddingClient, adapters: Dict[str,
 def main():
     print("="*70)
     print("  REAL-WORLD USE CASE BENCHMARK")
-    print("  ToonDB vs ChromaDB vs LanceDB")
+    print("  SochDB vs ChromaDB vs LanceDB")
     print("="*70)
     
     embed_client = EmbeddingClient()
@@ -454,7 +454,7 @@ def main():
     for scenario_name, scenario_fn in scenarios:
         # Create fresh adapters for each scenario
         adapters = {
-            "ToonDB": ToonDBAdapter(dimension),
+            "SochDB": SochDBAdapter(dimension),
             "ChromaDB": ChromaDBAdapter(dimension),
             "LanceDB": LanceDBAdapter(dimension),
         }
@@ -471,36 +471,36 @@ def main():
     print("  FINAL SUMMARY")
     print("="*70)
     
-    print("\n{:<25} {:>12} {:>12} {:>12}".format("Scenario", "ToonDB", "ChromaDB", "LanceDB"))
+    print("\n{:<25} {:>12} {:>12} {:>12}".format("Scenario", "SochDB", "ChromaDB", "LanceDB"))
     print("-"*70)
     
     for scenario_name, results in all_results.items():
-        toondb_ms = results.get("ToonDB", {}).get("search_ms", 0)
+        sochdb_ms = results.get("SochDB", {}).get("search_ms", 0)
         chroma_ms = results.get("ChromaDB", {}).get("search_ms", 0)
         lance_ms = results.get("LanceDB", {}).get("search_ms", 0)
         
         print("{:<25} {:>10.2f}ms {:>10.2f}ms {:>10.2f}ms".format(
-            scenario_name, toondb_ms, chroma_ms, lance_ms
+            scenario_name, sochdb_ms, chroma_ms, lance_ms
         ))
     
     # Compute averages
     print("-"*70)
     
-    toondb_avg = np.mean([r.get("ToonDB", {}).get("search_ms", 0) for r in all_results.values()])
+    sochdb_avg = np.mean([r.get("SochDB", {}).get("search_ms", 0) for r in all_results.values()])
     chroma_avg = np.mean([r.get("ChromaDB", {}).get("search_ms", 0) for r in all_results.values()])
     lance_avg = np.mean([r.get("LanceDB", {}).get("search_ms", 0) for r in all_results.values()])
     
     print("{:<25} {:>10.2f}ms {:>10.2f}ms {:>10.2f}ms".format(
-        "AVERAGE", toondb_avg, chroma_avg, lance_avg
+        "AVERAGE", sochdb_avg, chroma_avg, lance_avg
     ))
     
     print("\n" + "="*70)
-    print("  🏆 SPEEDUP vs ToonDB")
+    print("  🏆 SPEEDUP vs SochDB")
     print("="*70)
     
-    if toondb_avg > 0:
-        print(f"\n  ChromaDB: {chroma_avg/toondb_avg:.1f}x slower")
-        print(f"  LanceDB:  {lance_avg/toondb_avg:.1f}x slower")
+    if sochdb_avg > 0:
+        print(f"\n  ChromaDB: {chroma_avg/sochdb_avg:.1f}x slower")
+        print(f"  LanceDB:  {lance_avg/sochdb_avg:.1f}x slower")
     
     print("\n  ✓ Real-world benchmark completed!")
     print("="*70)

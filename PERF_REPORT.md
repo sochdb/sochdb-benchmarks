@@ -1,4 +1,4 @@
-# ToonDB Performance Report
+# SochDB Performance Report
 
 **Generated**: December 28, 2025
 **Environment**: macOS / Apple M2 Ultra / 10 cores / 32 GB RAM
@@ -7,7 +7,7 @@
 
 ## 🏆 Executive Summary
 
-| Category | ToonDB | Best Competitor | Advantage |
+| Category | SochDB | Best Competitor | Advantage |
 |----------|--------|-----------------|-----------|
 | **KV Insert** | **1.14M ops/s** | SQLite: 920K | **+24%** ✅ |
 | **Vector Insert** | **117,813 vec/s** | LanceDB: 103K | **Best overall** ✅ |
@@ -18,14 +18,14 @@
 
 ## 1. Rust KV Performance (100K records)
 
-### ToonDB vs SQLite (Single-Threaded)
+### SochDB vs SQLite (Single-Threaded)
 
-| Operation | ToonDB | SQLite | Winner |
+| Operation | SochDB | SQLite | Winner |
 |-----------|--------|--------|--------|
-| **Insert** | **1,139,074 ops/s** | 919,863 ops/s | **ToonDB +24%** ✅ |
+| **Insert** | **1,139,074 ops/s** | 919,863 ops/s | **SochDB +24%** ✅ |
 | **Scan** | 2,704,027 rows/s | 18,922,371 rows/s | SQLite 7x |
 
-> ToonDB excels at insert-heavy workloads typical of AI agents (logging, memory).
+> SochDB excels at insert-heavy workloads typical of AI agents (logging, memory).
 > SQLite's B-tree wins on sequential scans.
 
 ---
@@ -36,13 +36,13 @@
 
 | System | Insert (vec/s) | Search (ms) | vs NumPy |
 |--------|---------------|-------------|----------|
-| **ToonDB** | **117,813** | **0.030** | **20.3x** ✅ |
+| **SochDB** | **117,813** | **0.030** | **20.3x** ✅ |
 | LanceDB | 103,585 | 4.038 | 0.1x |
 | ChromaDB | 10,483 | 0.720 | 0.8x |
 | DuckDB | 4,144 | 0.871 | 0.7x |
 | NumPy (brute) | N/A | 0.603 | baseline |
 
-### ToonDB Advantages
+### SochDB Advantages
 
 - **11.2x faster insert** than ChromaDB
 - **24.2x faster search** than ChromaDB  
@@ -75,7 +75,7 @@
 | **Latency (p99)** | **0.203 ms** |
 | **Index Time** | **0.48 s** |
 
-> BEIR tests zero-shot retrieval quality. ToonDB's HNSW index provides sub-millisecond latency.
+> BEIR tests zero-shot retrieval quality. SochDB's HNSW index provides sub-millisecond latency.
 
 ---
 
@@ -101,10 +101,10 @@ cargo build --release
 
 # Rust KV benchmarks
 ./target/release/perf-run --workload benchmarks/workloads/rust/kv_put_scan.toml --runs 5 -v
-./target/release/perf-run --workload benchmarks/workloads/rust/sqlite_vs_toondb_360.toml --runs 5 -v
+./target/release/perf-run --workload benchmarks/workloads/rust/sqlite_vs_sochdb_360.toml --runs 5 -v
 
 # Vector benchmarks (vs ChromaDB, DuckDB, LanceDB)
-PYTHONPATH=$(pwd)/toondb-python-sdk/src TOONDB_LIB_PATH=$(pwd)/target/release \
+PYTHONPATH=$(pwd)/sochdb-python-sdk/src SOCHDB_LIB_PATH=$(pwd)/target/release \
 python3 benchmarks/comprehensive_benchmark.py
 
 # BEIR benchmark
@@ -128,11 +128,11 @@ python3 benchmarks/public/beir_runner.py --dataset scifact
 
 ## Conclusion
 
-ToonDB demonstrates **state-of-the-art performance** for AI/LLM workloads:
+SochDB demonstrates **state-of-the-art performance** for AI/LLM workloads:
 
 - ✅ **#1 in vector search latency** (0.030ms, 24x faster than alternatives)
 - ✅ **#1 in vector insert throughput** (117K vec/s)
 - ✅ **+24% faster inserts** than SQLite for KV workloads
 - ✅ **Sub-millisecond p99 latency** for agent memory retrieval
 
-ToonDB is optimized for the **write-heavy, low-latency** requirements of AI agents, RAG systems, and LLM context retrieval.
+SochDB is optimized for the **write-heavy, low-latency** requirements of AI agents, RAG systems, and LLM context retrieval.

@@ -1,14 +1,14 @@
-# ToonDB Benchmark System
+# SochDB Benchmark System
 
-A unified, reproducible benchmark framework for ToonDB performance testing.
+A unified, reproducible benchmark framework for SochDB performance testing.
 
 ## Latest Results (December 27, 2024)
 
-| Category | ToonDB | Competitor | Winner |
+| Category | SochDB | Competitor | Winner |
 |----------|--------|------------|--------|
-| **KV Insert** | 1.24M ops/s | SQLite: 908K | **ToonDB +37%** ✅ |
-| **Vector Insert** | 124K vec/s | ChromaDB: 10.6K | **ToonDB 11.7x** ✅ |
-| **Vector Search** | 35.4K QPS | ChromaDB: 1.3K | **ToonDB 27x** ✅ |
+| **KV Insert** | 1.24M ops/s | SQLite: 908K | **SochDB +37%** ✅ |
+| **Vector Insert** | 124K vec/s | ChromaDB: 10.6K | **SochDB 11.7x** ✅ |
+| **Vector Search** | 35.4K QPS | ChromaDB: 1.3K | **SochDB 27x** ✅ |
 
 See [BENCHMARK_RESULTS_2024-12-27.md](./BENCHMARK_RESULTS_2024-12-27.md) for full details.
 
@@ -19,7 +19,7 @@ benchmarks/
 ├── workloads/           # Benchmark workload definitions
 │   ├── rust/            # Rust-native workloads (TOML)
 │   │   ├── kv_put_scan.toml
-│   │   ├── sqlite_vs_toondb_360.toml
+│   │   ├── sqlite_vs_sochdb_360.toml
 │   │   └── vector_hnsw.toml
 │   ├── python/          # Python-based workloads (TOML)
 │   │   ├── ffi_kv_vs_sqlite.toml
@@ -110,7 +110,7 @@ Workloads are defined in TOML files:
 ```toml
 [workload]
 name = "kv_put_scan"
-description = "Measures ToonDB KV insert and scan performance"
+description = "Measures SochDB KV insert and scan performance"
 runner = "rust"        # "rust" or "python"
 binary = "perf-run"    # For rust runners
 script = "bench.py"    # For python runners
@@ -258,7 +258,7 @@ python benchmarks/datasets/scripts/generate_vectors.py \
 | Workload | Description |
 |----------|-------------|
 | `kv_put_scan` | Basic KV insert throughput and full-table scan |
-| `sqlite_vs_toondb_360` | Comprehensive ToonDB vs SQLite comparison |
+| `sqlite_vs_sochdb_360` | Comprehensive SochDB vs SQLite comparison |
 | `vector_hnsw` | HNSW vector index insert and search |
 
 ### Python Workloads
@@ -266,4 +266,4 @@ python benchmarks/datasets/scripts/generate_vectors.py \
 | Workload | Description |
 |----------|-------------|
 | `ffi_kv_vs_sqlite` | Python FFI KV operations vs SQLite |
-| `vector_vs_chroma` | ToonDB vector vs ChromaDB comparison |
+| `vector_vs_chroma` | SochDB vector vs ChromaDB comparison |

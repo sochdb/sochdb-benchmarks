@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TRUE Head-to-Head: ToonDB Python SDK vs ChromaDB
+TRUE Head-to-Head: SochDB Python SDK vs ChromaDB
 Both using Python APIs for fair comparison
 
 Run with: python3 benchmarks/python_headtohead.py
@@ -92,20 +92,20 @@ def benchmark_chromadb(vectors: np.ndarray, queries: np.ndarray):
         "qps": qps
     }
 
-def benchmark_toondb_kv(vectors: np.ndarray, queries: np.ndarray):
-    """Benchmark ToonDB Python SDK (key-value mode)"""
+def benchmark_sochdb_kv(vectors: np.ndarray, queries: np.ndarray):
+    """Benchmark SochDB Python SDK (key-value mode)"""
     try:
-        from toondb import Database
+        from sochdb import Database
     except ImportError:
-        print("ToonDB Python SDK not installed.")
-        print("Install with: cd toondb-python-sdk && pip install -e .")
+        print("SochDB Python SDK not installed.")
+        print("Install with: cd sochdb-python-sdk && pip install -e .")
         return None
 
     print("\n" + "="*60)
-    print("ToonDB Python SDK (KV Mode)")
+    print("SochDB Python SDK (KV Mode)")
     print("="*60)
     
-    toon_dir = "/tmp/toondb_h2h"
+    toon_dir = "/tmp/sochdb_h2h"
     if os.path.exists(toon_dir):
         shutil.rmtree(toon_dir)
     
@@ -146,7 +146,7 @@ def benchmark_toondb_kv(vectors: np.ndarray, queries: np.ndarray):
         
         print(f"Search (brute-force): {avg_latency:.2f}ms avg, {p50:.2f}ms p50")
         print(f"QPS: {qps:.0f}")
-        print("Note: ToonDB KV mode uses brute-force. Use toondb-index for HNSW.")
+        print("Note: SochDB KV mode uses brute-force. Use sochdb-index for HNSW.")
         
         db.close()
         shutil.rmtree(toon_dir, ignore_errors=True)
@@ -162,18 +162,18 @@ def benchmark_toondb_kv(vectors: np.ndarray, queries: np.ndarray):
         print(f"Error: {e}")
         return None
 
-def benchmark_toondb_kv_insert_only(vectors: np.ndarray):
-    """Benchmark just ToonDB insert performance"""
+def benchmark_sochdb_kv_insert_only(vectors: np.ndarray):
+    """Benchmark just SochDB insert performance"""
     try:
-        from toondb import Database
+        from sochdb import Database
     except ImportError:
         return None
 
     print("\n" + "="*60)
-    print("ToonDB Python SDK - Insert Only Benchmark")
+    print("SochDB Python SDK - Insert Only Benchmark")
     print("="*60)
     
-    toon_dir = "/tmp/toondb_insert"
+    toon_dir = "/tmp/sochdb_insert"
     if os.path.exists(toon_dir):
         shutil.rmtree(toon_dir)
     
@@ -216,7 +216,7 @@ def benchmark_toondb_kv_insert_only(vectors: np.ndarray):
 
 def main():
     print("="*60)
-    print("   TRUE HEAD-TO-HEAD: ToonDB Python SDK vs ChromaDB")
+    print("   TRUE HEAD-TO-HEAD: SochDB Python SDK vs ChromaDB")
     print("="*60)
     print(f"\nConfig: {NUM_VECTORS} vectors, {DIM}-dim, {NUM_QUERIES} queries, top-{TOP_K}")
     
@@ -230,9 +230,9 @@ def main():
     # ChromaDB
     results['chromadb'] = benchmark_chromadb(vectors, queries)
     
-    # ToonDB
-    results['toondb_kv'] = benchmark_toondb_kv(vectors[:1000], queries[:10])  # Smaller for brute-force
-    results['toondb_insert'] = benchmark_toondb_kv_insert_only(vectors)
+    # SochDB
+    results['sochdb_kv'] = benchmark_sochdb_kv(vectors[:1000], queries[:10])  # Smaller for brute-force
+    results['sochdb_insert'] = benchmark_sochdb_kv_insert_only(vectors)
     
     # Summary
     print("\n" + "="*60)
@@ -246,22 +246,22 @@ def main():
         r = results['chromadb']
         print(f"{'ChromaDB':<25} {r['insert_rate']:.0f}{'':<12} {r['avg_latency']:.2f}")
     
-    if results.get('toondb_insert'):
-        r = results['toondb_insert']
-        print(f"{'ToonDB (bulk insert)':<25} {r['bulk_rate']:.0f}{'':<12} {'N/A (KV mode)'}")
-        print(f"{'ToonDB (small txns)':<25} {r['small_txn_rate']:.0f}{'':<12} {'N/A (KV mode)'}")
+    if results.get('sochdb_insert'):
+        r = results['sochdb_insert']
+        print(f"{'SochDB (bulk insert)':<25} {r['bulk_rate']:.0f}{'':<12} {'N/A (KV mode)'}")
+        print(f"{'SochDB (small txns)':<25} {r['small_txn_rate']:.0f}{'':<12} {'N/A (KV mode)'}")
     
     print("\n" + "="*60)
     print("   NOTE")
     print("="*60)
     print("""
-• ToonDB Python SDK is for KEY-VALUE storage, not vector search
-• For vector search, use toondb-index (Rust HNSW implementation)
+• SochDB Python SDK is for KEY-VALUE storage, not vector search
+• For vector search, use sochdb-index (Rust HNSW implementation)
 • ChromaDB is purpose-built for embeddings with built-in HNSW
 
 Fair comparison metrics:
-• INSERT: ToonDB vs ChromaDB (both via Python)
-• SEARCH: Only meaningful for ChromaDB (HNSW) vs ToonDB-Index (Rust)
+• INSERT: SochDB vs ChromaDB (both via Python)
+• SEARCH: Only meaningful for ChromaDB (HNSW) vs SochDB-Index (Rust)
 """)
 
 if __name__ == "__main__":

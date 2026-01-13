@@ -1,4 +1,4 @@
-toondb-client>=0.2.4
+sochdb>=0.2.4
 chromadb
 lancedb
 duckdb>=0.9.0

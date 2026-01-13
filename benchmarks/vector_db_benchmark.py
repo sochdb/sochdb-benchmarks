@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Vector Database Benchmark: ChromaDB vs ToonDB-Index vs SQLite-VSS
+Vector Database Benchmark: ChromaDB vs SochDB-Index vs SQLite-VSS
 
 Run with: python3 vector_db_benchmark.py
 
@@ -117,11 +117,11 @@ def benchmark_numpy_baseline(vectors: np.ndarray, queries: np.ndarray):
     
     return {"insert_time": insert_time, "avg_latency": avg_latency, "p99_latency": p99_latency}
 
-def benchmark_toondb_index_subprocess():
-    """Run ToonDB index benchmarks via subprocess"""
-    print("\n--- ToonDB-Index (HNSW) ---")
-    print("(Run via: cd toondb-index && cargo run --release --bin hnsw_perf)")
-    print("See toondb-index/benches/ for detailed benchmarks")
+def benchmark_sochdb_index_subprocess():
+    """Run SochDB index benchmarks via subprocess"""
+    print("\n--- SochDB-Index (HNSW) ---")
+    print("(Run via: cd sochdb-index && cargo run --release --bin hnsw_perf)")
+    print("See sochdb-index/benches/ for detailed benchmarks")
     return None
 
 def main():
@@ -145,8 +145,8 @@ def main():
     # ChromaDB
     results['chromadb'] = benchmark_chromadb(vectors, queries)
     
-    # ToonDB (via subprocess - needs Rust compiled)
-    benchmark_toondb_index_subprocess()
+    # SochDB (via subprocess - needs Rust compiled)
+    benchmark_sochdb_index_subprocess()
     
     # Summary
     print("\n" + "=" * 60)
@@ -164,7 +164,7 @@ def main():
         r = results['chromadb']
         print(f"{'ChromaDB (HNSW)':<20} {NUM_VECTORS/r['insert_time']:.0f}{'':<12} {r['avg_latency']:.2f}{'':<11} {1000/r['avg_latency']:.0f}")
     
-    print("\nNote: ToonDB-Vector benchmarks run separately via Rust")
+    print("\nNote: SochDB-Vector benchmarks run separately via Rust")
     print("Run: cargo run --release -p engine-rs --bin bench")
 
 if __name__ == "__main__":

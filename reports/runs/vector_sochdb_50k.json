@@ -1,5 +1,5 @@
 {
-  "workload": "toondb_vector",
+  "workload": "sochdb_vector",
   "timestamp": "2025-12-27T16:01:16.031274",
   "config": {
     "num_vectors": 50000,

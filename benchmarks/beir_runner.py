@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-BEIR Benchmark Adapter for ToonDB
+BEIR Benchmark Adapter for SochDB
 
-Downloads BEIR datasets and evaluates ToonDB's retrieval quality
+Downloads BEIR datasets and evaluates SochDB's retrieval quality
 against standard IR benchmarks with metrics like nDCG@10 and Recall@k.
 
 BEIR: https://github.com/beir-cellar/beir
@@ -28,7 +28,7 @@ from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 from collections import defaultdict
 
-# Add ToonDB SDK to path
+# Add SochDB SDK to path
 
 
 @dataclass
@@ -150,19 +150,19 @@ def run_beir_benchmark(
     dataset_name: str,
     split: str = "test",
     top_k: int = 100,
-    use_toondb: bool = True,
+    use_sochdb: bool = True,
     max_docs: Optional[int] = None,
     max_queries: Optional[int] = None,
     verbose: bool = True,
 ) -> BEIRResult:
     """
-    Run BEIR benchmark on ToonDB.
+    Run BEIR benchmark on SochDB.
     
     Args:
         dataset_name: BEIR dataset name (e.g., "fiqa", "scifact", "nfcorpus")
         split: Dataset split ("test", "dev", "train")
         top_k: Number of results to retrieve
-        use_toondb: Use ToonDB index (vs brute force baseline)
+        use_sochdb: Use SochDB index (vs brute force baseline)
         max_docs: Limit corpus size for testing
         max_queries: Limit query count for testing
         verbose: Print progress
@@ -210,21 +210,21 @@ def run_beir_benchmark(
     dim = doc_embeddings.shape[1]
     
     # Build index
-    if use_toondb:
+    if use_sochdb:
         try:
-            from toondb import VectorIndex
+            from sochdb import VectorIndex
             if VectorIndex is None:
                 raise ImportError("VectorIndex not available")
         except ImportError as e:
-            print(f"ToonDB not available: {e}")
+            print(f"SochDB not available: {e}")
             print("Falling back to brute force")
-            use_toondb = False
+            use_sochdb = False
     
     index_start = time.perf_counter()
     
-    if use_toondb:
+    if use_sochdb:
         if verbose:
-            print("\nBuilding ToonDB HNSW index...")
+            print("\nBuilding SochDB HNSW index...")
         
         index = VectorIndex(dimension=dim, max_connections=16, ef_construction=100)
         ids = np.arange(len(doc_ids), dtype=np.uint64)
@@ -273,7 +273,7 @@ def run_beir_benchmark(
         # Search
         start = time.perf_counter()
         
-        if use_toondb:
+        if use_sochdb:
             results = index.search(query_vec, k=top_k)
             retrieved_ids = [idx_to_doc_id[int(r[0])] for r in results if int(r[0]) in idx_to_doc_id]
         else:
@@ -397,7 +397,7 @@ def run_multi_dataset_benchmark(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="BEIR Benchmark for ToonDB")
+    parser = argparse.ArgumentParser(description="BEIR Benchmark for SochDB")
     parser.add_argument(
         "--dataset", "-d",
         default="scifact",
@@ -427,7 +427,7 @@ def main():
         result = run_beir_benchmark(
             args.dataset,
             top_k=args.top_k,
-            use_toondb=not args.brute_force,
+            use_sochdb=not args.brute_force,
             max_docs=args.max_docs,
             max_queries=args.max_queries,
         )

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-TRUE Head-to-Head: ToonDB Vector vs ChromaDB
+TRUE Head-to-Head: SochDB Vector vs ChromaDB
 Both KV and Vector Search via Python APIs
 
 Run with: 
-  TOONDB_LIB_PATH=/path/to/target/release python3 benchmarks/full_headtohead.py
+  SOCHDB_LIB_PATH=/path/to/target/release python3 benchmarks/full_headtohead.py
 """
 
 import time
@@ -92,21 +92,21 @@ def benchmark_chromadb(vectors: np.ndarray, queries: np.ndarray):
         "qps": qps
     }
 
-def benchmark_toondb_vector(vectors: np.ndarray, queries: np.ndarray):
-    """Benchmark ToonDB Vector Index (HNSW)"""
+def benchmark_sochdb_vector(vectors: np.ndarray, queries: np.ndarray):
+    """Benchmark SochDB Vector Index (HNSW)"""
     # Add path for development
     
     try:
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         if VectorIndex is None:
             raise ImportError("VectorIndex not available")
     except ImportError as e:
-        print(f"\nToonDB VectorIndex not available: {e}")
-        print("Set TOONDB_LIB_PATH to the directory containing libtoondb_index.dylib")
+        print(f"\nSochDB VectorIndex not available: {e}")
+        print("Set SOCHDB_LIB_PATH to the directory containing libsochdb_index.dylib")
         return None
 
     print("\n" + "="*60)
-    print("ToonDB Vector Index (Rust HNSW via Python)")
+    print("SochDB Vector Index (Rust HNSW via Python)")
     print("="*60)
     
     # Create index with ChromaDB-matching parameters for fair comparison
@@ -148,7 +148,7 @@ def benchmark_toondb_vector(vectors: np.ndarray, queries: np.ndarray):
 
 def main():
     print("="*60)
-    print("   FULL HEAD-TO-HEAD: ToonDB vs ChromaDB")
+    print("   FULL HEAD-TO-HEAD: SochDB vs ChromaDB")
     print("   Both KV and Vector Search via Python APIs")
     print("="*60)
     print(f"\nConfig: {NUM_VECTORS} vectors, {DIM}-dim, {NUM_QUERIES} queries, top-{TOP_K}")
@@ -163,8 +163,8 @@ def main():
     # ChromaDB
     results['chromadb'] = benchmark_chromadb(vectors, queries)
     
-    # ToonDB Vector
-    results['toondb'] = benchmark_toondb_vector(vectors, queries)
+    # SochDB Vector
+    results['sochdb'] = benchmark_sochdb_vector(vectors, queries)
     
     # Summary
     print("\n" + "="*60)
@@ -178,30 +178,30 @@ def main():
         r = results['chromadb']
         print(f"{'ChromaDB (Python + HNSW)':<30} {r['insert_rate']:.0f}{'':<10} {r['avg_latency']:.3f}{'':<10} {r['qps']:.0f}")
     
-    if results.get('toondb'):
-        r = results['toondb']
-        print(f"{'ToonDB (Rust HNSW via Python)':<30} {r['insert_rate']:.0f}{'':<10} {r['avg_latency']:.3f}{'':<10} {r['qps']:.0f}")
+    if results.get('sochdb'):
+        r = results['sochdb']
+        print(f"{'SochDB (Rust HNSW via Python)':<30} {r['insert_rate']:.0f}{'':<10} {r['avg_latency']:.3f}{'':<10} {r['qps']:.0f}")
     
     # Comparison
-    if results.get('chromadb') and results.get('toondb'):
+    if results.get('chromadb') and results.get('sochdb'):
         print("\n" + "="*60)
         print("   PERFORMANCE COMPARISON")
         print("="*60)
         
         c = results['chromadb']
-        t = results['toondb']
+        t = results['sochdb']
         
         insert_speedup = t['insert_rate'] / c['insert_rate']
         search_speedup = c['avg_latency'] / t['avg_latency']
         qps_speedup = t['qps'] / c['qps']
         
-        print(f"\n  Insert Speed: ToonDB is {insert_speedup:.1f}x {'faster' if insert_speedup > 1 else 'slower'}")
-        print(f"  Search Speed: ToonDB is {search_speedup:.1f}x faster")
-        print(f"  QPS: ToonDB is {qps_speedup:.1f}x higher")
+        print(f"\n  Insert Speed: SochDB is {insert_speedup:.1f}x {'faster' if insert_speedup > 1 else 'slower'}")
+        print(f"  Search Speed: SochDB is {search_speedup:.1f}x faster")
+        print(f"  QPS: SochDB is {qps_speedup:.1f}x higher")
         
         print("\n" + "-"*60)
         if search_speedup > 1:
-            print(f"  🏆 WINNER: ToonDB ({search_speedup:.0f}x faster vector search!)")
+            print(f"  🏆 WINNER: SochDB ({search_speedup:.0f}x faster vector search!)")
         else:
             print(f"  🏆 WINNER: ChromaDB")
 

@@ -1,10 +1,10 @@
-# ToonDB Performance Profiling Report
+# SochDB Performance Profiling Report
 
 Generated: 2025-12-28 17:23:36
 
 ## Executive Summary
 
-ToonDB performance analysis with detailed profiling of insert and search operations.
+SochDB performance analysis with detailed profiling of insert and search operations.
 
 ---
 
@@ -32,9 +32,9 @@ ToonDB performance analysis with detailed profiling of insert and search operati
 
 ---
 
-## 3. ToonDB vs ChromaDB (768D, 5K vectors, ef=48)
+## 3. SochDB vs ChromaDB (768D, 5K vectors, ef=48)
 
-| Metric | ToonDB | ChromaDB | Ratio |
+| Metric | SochDB | ChromaDB | Ratio |
 |--------|--------|----------|-------|
 | Insert Rate | 127 vec/s | 2,069 vec/s | 0.06x |
 | Search (p50) | 2.95ms | 2.63ms | 0.9x faster |

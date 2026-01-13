@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Agent Memory Systems Benchmark: ToonDB vs Zep vs Mem0
+Agent Memory Systems Benchmark: SochDB vs Zep vs Mem0
 
 Real-world benchmark comparing agent memory systems using actual LLM calls.
 Tests based on the Zep vs Mem0 controversy:
@@ -143,11 +143,11 @@ class MemoryStats:
         return statistics.mean(self.context_sizes) if self.context_sizes else 0.0
 
 
-class ToonDBMemoryAdapter:
-    """ToonDB-based agent memory system."""
+class SochDBMemoryAdapter:
+    """SochDB-based agent memory system."""
 
     def __init__(self, llm: LLMClient):
-        from toondb import VectorIndex
+        from sochdb import VectorIndex
         self.llm = llm
         self.index = VectorIndex(dimension=llm.config.embedding_dimension, max_connections=32, ef_construction=200)
         self.memories: List[Dict[str, Any]] = []
@@ -525,7 +525,7 @@ class AgentMemoryBenchmark:
         """Run benchmarks on all memory systems."""
         print("="*70)
         print("  AGENT MEMORY SYSTEMS BENCHMARK")
-        print("  ToonDB vs Zep vs Mem0")
+        print("  SochDB vs Zep vs Mem0")
         print("="*70)
         print(f"\n  Configuration:")
         print(f"    Conversations: {self.config.num_conversations}")
@@ -534,14 +534,14 @@ class AgentMemoryBenchmark:
 
         all_results = []
 
-        # ToonDB
+        # SochDB
         print("\n" + "="*70)
-        toondb_adapter = ToonDBMemoryAdapter(self.llm)
+        sochdb_adapter = SochDBMemoryAdapter(self.llm)
         try:
-            results = self.run_conversation_benchmark("ToonDB", toondb_adapter)
+            results = self.run_conversation_benchmark("SochDB", sochdb_adapter)
             all_results.append(results)
         finally:
-            toondb_adapter.cleanup()
+            sochdb_adapter.cleanup()
 
         # Mem0
         print("\n" + "="*70)
@@ -583,18 +583,18 @@ class AgentMemoryBenchmark:
                   f"{r['p95_search_latency_ms']:<16.2f} {r['avg_recall_score']:<10.2%} "
                   f"{r['avg_context_tokens']:<12.0f}")
 
-        # Speedup comparison (vs ToonDB)
+        # Speedup comparison (vs SochDB)
         if len(results) > 1:
             print("\n" + "="*70)
-            print("  PERFORMANCE vs ToonDB")
+            print("  PERFORMANCE vs SochDB")
             print("="*70)
 
-            toondb_result = next((r for r in results if r['system'] == 'ToonDB'), None)
-            if toondb_result:
-                baseline_latency = toondb_result['p95_search_latency_ms']
+            sochdb_result = next((r for r in results if r['system'] == 'SochDB'), None)
+            if sochdb_result:
+                baseline_latency = sochdb_result['p95_search_latency_ms']
 
                 for r in results:
-                    if r['system'] != 'ToonDB':
+                    if r['system'] != 'SochDB':
                         speedup = r['p95_search_latency_ms'] / baseline_latency
                         if speedup > 1:
                             print(f"\n  {r['system']}: {speedup:.2f}x SLOWER")

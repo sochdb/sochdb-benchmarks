@@ -3,10 +3,10 @@
 Hardware Microbenchmark: SIMD Efficiency
 Measures the raw throughput of the cosine distance kernel.
 
-Goal: Validate that ToonDB's Rust-based FFI kernels are using AVX/NEON 
+Goal: Validate that SochDB's Rust-based FFI kernels are using AVX/NEON 
 instructions effectively by comparing against highly optimized NumPy (BLAS/LAPACK).
 
-If ToonDB is comparable to or faster than NumPy for small-vector ops, 
+If SochDB is comparable to or faster than NumPy for small-vector ops, 
 it proves the overhead of FFI is negligible and SIMD is active.
 """
 
@@ -15,9 +15,9 @@ import numpy as np
 import sys
 
 try:
-    import toondb
+    import sochdb
 except ImportError:
-    print("ToonDB not installed.")
+    print("SochDB not installed.")
     sys.exit(0)
 
 # =============================================================================
@@ -35,8 +35,8 @@ def bench_numpy(v1, v2, iters):
         np.dot(v1, v2)
     return time.perf_counter() - start
 
-def bench_toondb(index, v1, iters):
-    # ToonDB doesn't expose raw distance function in Python API usually.
+def bench_sochdb(index, v1, iters):
+    # SochDB doesn't expose raw distance function in Python API usually.
     # We simulate it by doing a search for k=1 on an index with 1 vector.
     # This includes HNSW protocol overhead, so it's a "strict" test.
     # If this is close to NumPy, the kernel is blazing fast.
@@ -56,19 +56,19 @@ def main():
     v1 = np.random.randn(DIM).astype(np.float32)
     v1 /= np.linalg.norm(v1)
     
-    # Setup ToonDB
+    # Setup SochDB
     # Create an index with just 1 vector to isolate distance calc/overhead
     try:
-        index = toondb.VectorIndex(dimension=DIM, max_connections=16, ef_construction=100)
+        index = sochdb.VectorIndex(dimension=DIM, max_connections=16, ef_construction=100)
         index.insert(0, v1)
     except Exception as e:
-        print(f"Failed to init ToonDB: {e}")
+        print(f"Failed to init SochDB: {e}")
         return
 
     # Warmup
     print("Warming up...")
     bench_numpy(v1, v1, WARMUP)
-    bench_toondb(index, v1, WARMUP)
+    bench_sochdb(index, v1, WARMUP)
     
     # Run NumPy
     print(f"Testing NumPy (BLAS)...", end="", flush=True)
@@ -76,9 +76,9 @@ def main():
     ops_np = ITERATIONS / t_np
     print(f" {t_np:.4f}s ({ops_np:,.0f} ops/sec)")
     
-    # Run ToonDB
-    print(f"Testing ToonDB (Rust FFI + HNSW)...", end="", flush=True)
-    t_toon = bench_toondb(index, v1, ITERATIONS)
+    # Run SochDB
+    print(f"Testing SochDB (Rust FFI + HNSW)...", end="", flush=True)
+    t_toon = bench_sochdb(index, v1, ITERATIONS)
     ops_toon = ITERATIONS / t_toon
     print(f" {t_toon:.4f}s ({ops_toon:,.0f} ops/sec)")
     
@@ -88,7 +88,7 @@ def main():
     print(f"Relative Performance: {ratio:.2f}x vs NumPy")
     
     if ratio > 0.5:
-        print("✅ PASS: ToonDB kernel is efficient (includes FFI overhead)")
+        print("✅ PASS: SochDB kernel is efficient (includes FFI overhead)")
     else:
         print("⚠️ WARNING: Significant FFI/Kernel bottleneck detected")
 
