@@ -68,3 +68,19 @@ and writes:
 - per-run result JSON
 - summary JSON
 - summary table text
+
+## Server-only embedding bakeoff
+
+If we want to improve retrieval quality, the next likely lever after HNSW sweeps is embeddings.
+
+The server-only runner for that is:
+
+- `scripts/run_sochdb_embedding_bakeoff.sh`
+
+It does this on the server:
+
+1. generates embeddings for each configured model
+2. runs the same HNSW quality sweep for each embedding set
+3. writes one result directory per model
+
+That keeps the heavy work off the laptop and keeps the comparison methodology clean.
