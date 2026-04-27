@@ -40,3 +40,31 @@ DATASET_DIR=/root/sochdb-benchmark-runs/datasets/scifact \
 EMBEDDING_DIR=/root/sochdb-benchmark-runs/datasets/scifact-embeddings \
 /root/sochdb-benchmark-runs/work/run_sochdb_grpc_pilot.sh
 ```
+
+## Quality-first benchmark lane
+
+For quality work, we should avoid mixing too many variables at once.
+
+The evaluation order should be:
+
+1. fix the dataset
+2. fix the embedding model
+3. sweep HNSW settings
+4. compare recall / nDCG / latency
+5. only then compare different embedding models
+
+The first quality sweep runner is:
+
+- `scripts/run_sochdb_grpc_quality_sweep.sh`
+
+It compares three useful HNSW profiles:
+
+- `fast`
+- `balanced`
+- `quality`
+
+and writes:
+
+- per-run result JSON
+- summary JSON
+- summary table text
