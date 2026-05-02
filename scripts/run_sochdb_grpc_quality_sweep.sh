@@ -6,8 +6,8 @@ if [[ -z "${DATASET_DIR:-}" || -z "${EMBEDDING_DIR:-}" ]]; then
   exit 1
 fi
 
-SOCHDB_REPO="${SOCHDB_REPO:-/root/sochdb}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-/root/sochdb-benchmark-runs/results}"
+SOCHDB_REPO="${SOCHDB_REPO:-${HOME}/sochdb}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-${HOME}/sochdb-benchmark-runs/results}"
 HOST="${SOCHDB_GRPC_HOST:-studio.agentslab.host}"
 PORT="${SOCHDB_GRPC_PORT:-50053}"
 TOP_K="${TOP_K:-5}"

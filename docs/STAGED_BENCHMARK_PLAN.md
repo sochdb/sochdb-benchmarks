@@ -1,5 +1,9 @@
 # Staged Benchmark Plan
 
+For the current hosted benchmark state and the already-established retrieval
+quality takeaway, start with
+[`SERVER_BENCHMARK_STATUS.md`](./SERVER_BENCHMARK_STATUS.md).
+
 ## Why staged
 
 The current benchmark server does not have enough free root-disk capacity for a
@@ -16,10 +20,10 @@ So we should run staged sizes:
 
 Server:
 
-- `/root/sochdb-benchmark-runs/datasets`
-- `/root/sochdb-benchmark-runs/results`
-- `/root/sochdb-benchmark-runs/logs`
-- `/root/sochdb-benchmark-runs/work`
+- `<benchmark-workspace>/datasets`
+- `<benchmark-workspace>/results`
+- `<benchmark-workspace>/logs`
+- `<benchmark-workspace>/work`
 
 ## Pilot runner
 
@@ -36,9 +40,9 @@ It wraps the gRPC retrieval benchmark and writes:
 ## Example
 
 ```bash
-DATASET_DIR=/root/sochdb-benchmark-runs/datasets/scifact \
-EMBEDDING_DIR=/root/sochdb-benchmark-runs/datasets/scifact-embeddings \
-/root/sochdb-benchmark-runs/work/run_sochdb_grpc_pilot.sh
+DATASET_DIR=$HOME/sochdb-benchmark-runs/datasets/scifact \
+EMBEDDING_DIR=$HOME/sochdb-benchmark-runs/datasets/scifact-embeddings \
+$HOME/sochdb-benchmark-runs/work/run_sochdb_grpc_pilot.sh
 ```
 
 ## Quality-first benchmark lane
@@ -84,3 +88,13 @@ It does this on the server:
 3. writes one result directory per model
 
 That keeps the heavy work off the laptop and keeps the comparison methodology clean.
+
+When models need different embedding backends, use `MODEL_BACKENDS` to override
+the default backend per model. Example:
+
+```bash
+DATASET_DIR=$HOME/sochdb-benchmark-runs/datasets/scifact \
+MODEL_BACKENDS=thenlper/gte-small=sentence-transformers \
+MODELS=BAAI/bge-small-en-v1.5,thenlper/gte-small \
+$HOME/sochdb-benchmark-runs/work/run_sochdb_embedding_bakeoff.sh
+```

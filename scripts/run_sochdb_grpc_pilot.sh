@@ -12,25 +12,29 @@ set -euo pipefail
 #   SOCHDB_GRPC_PORT   default: 50053
 #   TOP_K              default: 5
 #   INDEX_NAME_PREFIX  default: pilot
-#   OUTPUT_ROOT        default: /root/sochdb-benchmark-runs/results
+#   WORK_ROOT          default: $HOME/sochdb-benchmark-runs
+#   SOCHDB_REPO        default: $HOME/sochdb
+#   OUTPUT_ROOT        default: $WORK_ROOT/results
 #
 # Example:
-#   DATASET_DIR=/root/sochdb-benchmark-runs/datasets/scifact \
-#   EMBEDDING_DIR=/root/sochdb-benchmark-runs/datasets/scifact-embeddings \
-#   /root/sochdb-benchmark-runs/work/run_sochdb_grpc_pilot.sh
+#   DATASET_DIR=$HOME/sochdb-benchmark-runs/datasets/scifact \
+#   EMBEDDING_DIR=$HOME/sochdb-benchmark-runs/datasets/scifact-embeddings \
+#   $HOME/sochdb-benchmark-runs/work/run_sochdb_grpc_pilot.sh
 
 SOCHDB_GRPC_HOST="${SOCHDB_GRPC_HOST:-studio.agentslab.host}"
 SOCHDB_GRPC_PORT="${SOCHDB_GRPC_PORT:-50053}"
 TOP_K="${TOP_K:-5}"
 INDEX_NAME_PREFIX="${INDEX_NAME_PREFIX:-pilot}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-/root/sochdb-benchmark-runs/results}"
+WORK_ROOT="${WORK_ROOT:-${HOME}/sochdb-benchmark-runs}"
+SOCHDB_REPO="${SOCHDB_REPO:-${HOME}/sochdb}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-${WORK_ROOT}/results}"
+LOG_DIR="${LOG_DIR:-${WORK_ROOT}/logs}"
 
 : "${DATASET_DIR:?DATASET_DIR is required}"
 : "${EMBEDDING_DIR:?EMBEDDING_DIR is required}"
 
 RUN_ID="$(date -u +%Y%m%dT%H%M%SZ)"
 RUN_DIR="${OUTPUT_ROOT}/${RUN_ID}"
-LOG_DIR="/root/sochdb-benchmark-runs/logs"
 mkdir -p "${RUN_DIR}" "${LOG_DIR}"
 
 RESULT_JSON="${RUN_DIR}/sochdb_grpc.json"
@@ -57,7 +61,7 @@ INDEX_NAME="${INDEX_NAME_PREFIX}_${RUN_ID}"
   echo
 } | tee "${LOG_FILE}"
 
-python3 /root/sochdb/benchmarks/retrieval/run_sochdb_grpc.py \
+python3 "${SOCHDB_REPO}/benchmarks/retrieval/run_sochdb_grpc.py" \
   --host "${SOCHDB_GRPC_HOST}" \
   --port "${SOCHDB_GRPC_PORT}" \
   --dataset-dir "${DATASET_DIR}" \
