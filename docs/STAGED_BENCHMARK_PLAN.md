@@ -25,6 +25,36 @@ Server:
 - `<benchmark-workspace>/logs`
 - `<benchmark-workspace>/work`
 
+## First staged `10GB` lane
+
+For the first large-scale system pass, use a synthetic normalized-vector dataset
+for throughput and latency characterization. Keep this separate from the SciFact
+quality lane.
+
+Reusable scripts:
+
+- `scripts/generate_staged_vector_dataset.py`
+- `scripts/run_sochdb_stage_vector.sh`
+
+What this lane measures:
+
+- insert throughput
+- search QPS
+- search latency percentiles
+- dataset payload size and run metadata
+
+What it does not claim:
+
+- retrieval quality on BEIR/SciFact
+- production corpus realism
+
+Example:
+
+```bash
+TARGET_GIB=10 DIM=768 \
+$HOME/sochdb-benchmark-runs/work/run_sochdb_stage_vector.sh
+```
+
 ## Pilot runner
 
 The first reusable runner is:
