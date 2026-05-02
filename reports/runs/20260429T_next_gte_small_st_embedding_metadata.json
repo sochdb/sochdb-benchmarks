@@ -1,0 +1,11 @@
+{
+  "backend": "sentence-transformers",
+  "model_name": "thenlper/gte-small",
+  "document_count": 5183,
+  "query_count": 300,
+  "dimension": 384,
+  "documents_file": "doc_embeddings.npy",
+  "queries_file": "query_embeddings.npy",
+  "document_ids_file": "doc_ids.json",
+  "query_ids_file": "query_ids.json"
+}
