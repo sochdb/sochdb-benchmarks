@@ -35,6 +35,14 @@ Reusable scripts:
 
 - `scripts/generate_staged_vector_dataset.py`
 - `scripts/run_sochdb_stage_vector.sh`
+- `benchmarks/run_bulk_vector_workload.py`
+
+Current server state:
+
+- run `20260503T_stage10gb_d768` is in progress on the benchmark server
+- dataset: `synthetic_10gib_768d`
+- runner path now uses the compiled `sochdb-bulk` binary for index build/query
+- this avoids the stale in-process `VectorIndex` path that failed on the hosted box
 
 What this lane measures:
 

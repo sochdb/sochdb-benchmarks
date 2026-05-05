@@ -26,10 +26,13 @@ WORK_ROOT="${WORK_ROOT:-${HOME}/sochdb-benchmark-runs}"
 SOCHDB_REPO="${SOCHDB_REPO:-${HOME}/sochdb}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VECTOR_RUNNER="${VECTOR_RUNNER:-${SCRIPT_DIR}/run_vector_workload.py}"
+VECTOR_RUNNER="${VECTOR_RUNNER:-${SCRIPT_DIR}/run_bulk_vector_workload.py}"
+SOCHDB_PYTHONPATH="${SOCHDB_PYTHONPATH:-${HOME}/sochdb/sochdb-python/python}"
+SOCHDB_LIB_PATH="${SOCHDB_LIB_PATH:-${HOME}/sochdb/target/release}"
+SOCHDB_BULK_BIN_DIR="${SOCHDB_BULK_BIN_DIR:-${HOME}/test-venv/bin}"
 TARGET_GIB="${TARGET_GIB:-10}"
 DIM="${DIM:-768}"
-QUERIES="${QUERIES:-1000}"
+QUERIES="${QUERIES:-250}"
 M="${M:-16}"
 EF_CONSTRUCTION="${EF_CONSTRUCTION:-100}"
 EF_SEARCH="${EF_SEARCH:-64}"
@@ -43,6 +46,7 @@ LOG_DIR="${WORK_ROOT}/logs"
 LOG_FILE="${LOG_DIR}/sochdb-stage-${RUN_ID}.log"
 RESULT_JSON="${RUN_DIR}/sochdb_vector.json"
 METADATA_JSON="${RUN_DIR}/metadata.json"
+INDEX_PATH="${RUN_DIR}/sochdb_vector.hnsw"
 
 mkdir -p "${DATASET_DIR}" "${RUN_DIR}" "${LOG_DIR}"
 
@@ -60,6 +64,9 @@ mkdir -p "${DATASET_DIR}" "${RUN_DIR}" "${LOG_DIR}"
   echo "ef_search=${EF_SEARCH}"
   echo "batch_size=${BATCH_SIZE}"
   echo "vector_runner=${VECTOR_RUNNER}"
+  echo "sochdb_pythonpath=${SOCHDB_PYTHONPATH}"
+  echo "sochdb_lib_path=${SOCHDB_LIB_PATH}"
+  echo "sochdb_bulk_bin_dir=${SOCHDB_BULK_BIN_DIR}"
   echo
   echo "--- machine snapshot ---"
   hostname
@@ -84,13 +91,18 @@ fi
 echo "Running SochDB vector workload..." | tee -a "${LOG_FILE}"
 (
   cd "${SOCHDB_REPO}"
-  "${PYTHON_BIN}" "${VECTOR_RUNNER}" \
+  env \
+    PYTHONPATH="${SOCHDB_PYTHONPATH}" \
+    SOCHDB_LIB_PATH="${SOCHDB_LIB_PATH}" \
+    PATH="${SOCHDB_BULK_BIN_DIR}:${PATH}" \
+    "${PYTHON_BIN}" "${VECTOR_RUNNER}" \
     --dataset "${DATASET_DIR}" \
     --queries "${QUERIES}" \
     --M "${M}" \
     --ef-construction "${EF_CONSTRUCTION}" \
     --ef-search "${EF_SEARCH}" \
     --batch-size "${BATCH_SIZE}" \
+    --index-path "${INDEX_PATH}" \
     --output "${RESULT_JSON}"
 ) | tee -a "${LOG_FILE}"
 
@@ -108,6 +120,7 @@ payload = {
     "dataset_name": "${DATASET_NAME}",
     "dataset_dir": "<benchmark-workspace>/datasets/${DATASET_NAME}",
     "result_json": "<benchmark-workspace>/results/${RUN_ID}_${DATASET_NAME}/sochdb_vector.json",
+    "index_path": "<benchmark-workspace>/results/${RUN_ID}_${DATASET_NAME}/sochdb_vector.hnsw",
     "target_gib": float("${TARGET_GIB}"),
     "dimension": int("${DIM}"),
     "queries": int("${QUERIES}"),
@@ -115,6 +128,7 @@ payload = {
     "ef_construction": int("${EF_CONSTRUCTION}"),
     "ef_search": int("${EF_SEARCH}"),
     "batch_size": int("${BATCH_SIZE}"),
+    "sochdb_bulk_bin_dir": "<benchmark-workspace-or-server-bin>/sochdb-bulk",
     "dataset_meta": meta,
 }
 print(json.dumps(payload, indent=2))

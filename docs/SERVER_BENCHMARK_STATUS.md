@@ -192,10 +192,30 @@ For large-scale system work:
 3. run `250GB` only after confirming disk headroom
 4. defer `1TB` until storage is expanded
 
+## Current staged run
+
+The first staged large-scale run is active on the server now:
+
+- run id: `20260503T_stage10gb_d768`
+- dataset: `synthetic_10gib_768d`
+- target size: `10 GiB`
+- dimension: `768`
+- query count: `250`
+- runner: `scripts/run_sochdb_stage_vector.sh`
+- workload: `benchmarks/run_bulk_vector_workload.py`
+
+Important implementation note:
+
+- the staged lane now uses the compiled `sochdb-bulk` binary on the server for
+  build and query operations
+- this replaced the earlier Python-only workload path, which failed on the
+  hosted machine because the stale `VectorIndex` import path was not available
+
 ## Scripts that define the server lane
 
 - `scripts/run_sochdb_grpc_quality_sweep.sh`
 - `scripts/run_sochdb_embedding_bakeoff.sh`
+- `scripts/run_sochdb_stage_vector.sh`
 
 Related planning docs:
 
