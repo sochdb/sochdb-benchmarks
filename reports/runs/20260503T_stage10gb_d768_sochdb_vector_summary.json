@@ -1,0 +1,28 @@
+{
+  "workload": "sochdb_bulk_cli_vector",
+  "timestamp": "2026-05-05T16:03:17.506231",
+  "config": {
+    "num_vectors": 3495253,
+    "num_queries": 250,
+    "dimension": 768,
+    "M": 16,
+    "ef_construction": 100,
+    "ef_search": 64,
+    "k": 10,
+    "batch_size": 1000,
+    "index_path": "<benchmark-workspace>/results/20260503T_stage10gb_d768_synthetic_10gib_768d/sochdb_vector.hnsw"
+  },
+  "build": {
+    "total_s": 3920.141297524795,
+    "rate_vec_per_s": 891.6140349856593,
+    "output_size_mb": 10069.106410980225
+  },
+  "search": {
+    "total_s": 27455.906054357998,
+    "qps": 0.009105509011614579,
+    "p50_ms": 109814.431307,
+    "p95_ms": 110108.194244,
+    "p99_ms": 110398.439296,
+    "mean_ms": 109821.97473003599
+  }
+}

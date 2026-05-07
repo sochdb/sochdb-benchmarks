@@ -39,10 +39,18 @@ Reusable scripts:
 
 Current server state:
 
-- run `20260503T_stage10gb_d768` is in progress on the benchmark server
+- run `20260503T_stage10gb_d768` completed on the benchmark server
 - dataset: `synthetic_10gib_768d`
 - runner path now uses the compiled `sochdb-bulk` binary for index build/query
 - this avoids the stale in-process `VectorIndex` path that failed on the hosted box
+
+Current outcome:
+
+- build completed successfully for `3,495,253` vectors at about `892 vec/s`
+- output index size was about `10,069 MB`
+- search throughput was only about `0.0091 QPS`
+- `p50` query latency was about `109,814 ms`
+- the next priority is query-path investigation before moving on to `100GB`
 
 What this lane measures:
 

@@ -58,6 +58,8 @@ Local snapshots now checked into this repo:
 - [`reports/runs/20260429T_next_bge_base_embedding_metadata.json`](../reports/runs/20260429T_next_bge_base_embedding_metadata.json)
 - [`reports/runs/20260429T_next_gte_small_st_summary.json`](../reports/runs/20260429T_next_gte_small_st_summary.json)
 - [`reports/runs/20260429T_next_gte_small_st_embedding_metadata.json`](../reports/runs/20260429T_next_gte_small_st_embedding_metadata.json)
+- [`reports/runs/20260503T_stage10gb_d768_sochdb_vector_summary.json`](../reports/runs/20260503T_stage10gb_d768_sochdb_vector_summary.json)
+- [`reports/runs/20260503T_stage10gb_d768_metadata.json`](../reports/runs/20260503T_stage10gb_d768_metadata.json)
 
 ## Established quality finding
 
@@ -194,7 +196,7 @@ For large-scale system work:
 
 ## Current staged run
 
-The first staged large-scale run is active on the server now:
+The first staged large-scale run is now complete:
 
 - run id: `20260503T_stage10gb_d768`
 - dataset: `synthetic_10gib_768d`
@@ -203,6 +205,8 @@ The first staged large-scale run is active on the server now:
 - query count: `250`
 - runner: `scripts/run_sochdb_stage_vector.sh`
 - workload: `benchmarks/run_bulk_vector_workload.py`
+- local summary: [`reports/runs/20260503T_stage10gb_d768_sochdb_vector_summary.json`](../reports/runs/20260503T_stage10gb_d768_sochdb_vector_summary.json)
+- local metadata: [`reports/runs/20260503T_stage10gb_d768_metadata.json`](../reports/runs/20260503T_stage10gb_d768_metadata.json)
 
 Important implementation note:
 
@@ -210,6 +214,31 @@ Important implementation note:
   build and query operations
 - this replaced the earlier Python-only workload path, which failed on the
   hosted machine because the stale `VectorIndex` import path was not available
+
+### `10GB` staged result
+
+What succeeded:
+
+- index build completed successfully for `3,495,253` vectors
+- build time was about `3920.14 s` (`~65.3 min`)
+- observed build throughput was about `891.6 vec/s`
+- output index size was about `10,069.1 MB`
+
+What failed the performance bar:
+
+- `250` queries took about `27,455.91 s`
+- search throughput was only about `0.0091 QPS`
+- `p50` latency was about `109,814 ms`
+- `p95` latency was about `110,108 ms`
+- `mean` latency was about `109,822 ms`
+
+Interpretation:
+
+- the staged runner itself is now working end to end
+- the bottleneck has moved from benchmark plumbing to SochDB query-path behavior
+- we should not scale this lane to `100GB` yet
+- the next benchmark task is diagnosing why the current search path is roughly
+  `~110 s` per query at `10GB`
 
 ## Scripts that define the server lane
 
@@ -224,7 +253,8 @@ Related planning docs:
 
 ## What is still pending
 
-- complete the staged `10GB` -> `100GB` -> `250GB` scale path
+- investigate the `10GB` search-latency failure before running `100GB`
+- complete the staged `10GB` -> `100GB` -> `250GB` scale path after that
 - defer `1TB` claims until storage is expanded
 
 This file should be the first place to update whenever new server benchmark work
