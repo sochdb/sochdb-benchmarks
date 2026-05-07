@@ -1,0 +1,35 @@
+[
+  {
+    "system": "sochdb-2.0-grpc",
+    "query_count": 300,
+    "recall@5": 0.8120555555555555,
+    "mrr": 0.7017222222222222,
+    "ndcg@5": 0.725788568481588,
+    "p50_ms": 1.787,
+    "p95_ms": 3.287,
+    "mean_ms": 1.951,
+    "result_file": "<benchmark-workspace>/results/20260429T_next_bge_base/BAAI_bge-base-en-v1.5/sweep/sochdb_grpc_fast.json"
+  },
+  {
+    "system": "sochdb-2.0-grpc",
+    "query_count": 300,
+    "recall@5": 0.8120555555555555,
+    "mrr": 0.7017222222222222,
+    "ndcg@5": 0.725788568481588,
+    "p50_ms": 2.683,
+    "p95_ms": 4.243,
+    "mean_ms": 2.989,
+    "result_file": "<benchmark-workspace>/results/20260429T_next_bge_base/BAAI_bge-base-en-v1.5/sweep/sochdb_grpc_balanced.json"
+  },
+  {
+    "system": "sochdb-2.0-grpc",
+    "query_count": 300,
+    "recall@5": 0.8120555555555555,
+    "mrr": 0.7017222222222222,
+    "ndcg@5": 0.725788568481588,
+    "p50_ms": 1.823,
+    "p95_ms": 2.946,
+    "mean_ms": 2.189,
+    "result_file": "<benchmark-workspace>/results/20260429T_next_bge_base/BAAI_bge-base-en-v1.5/sweep/sochdb_grpc_quality.json"
+  }
+]

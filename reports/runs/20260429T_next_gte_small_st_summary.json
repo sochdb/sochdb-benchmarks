@@ -1,0 +1,35 @@
+[
+  {
+    "system": "sochdb-2.0-grpc",
+    "query_count": 300,
+    "recall@5": 0.7786111111111111,
+    "mrr": 0.6710555555555555,
+    "ndcg@5": 0.6944313470123963,
+    "p50_ms": 0.955,
+    "p95_ms": 1.028,
+    "mean_ms": 0.878,
+    "result_file": "<benchmark-workspace>/results/20260429T_next_gte_small_st/thenlper_gte-small/sweep/sochdb_grpc_fast.json"
+  },
+  {
+    "system": "sochdb-2.0-grpc",
+    "query_count": 300,
+    "recall@5": 0.7786111111111111,
+    "mrr": 0.6710555555555555,
+    "ndcg@5": 0.6944313470123963,
+    "p50_ms": 0.976,
+    "p95_ms": 1.049,
+    "mean_ms": 0.888,
+    "result_file": "<benchmark-workspace>/results/20260429T_next_gte_small_st/thenlper_gte-small/sweep/sochdb_grpc_balanced.json"
+  },
+  {
+    "system": "sochdb-2.0-grpc",
+    "query_count": 300,
+    "recall@5": 0.7786111111111111,
+    "mrr": 0.6710555555555555,
+    "ndcg@5": 0.6944313470123963,
+    "p50_ms": 0.968,
+    "p95_ms": 1.056,
+    "mean_ms": 0.901,
+    "result_file": "<benchmark-workspace>/results/20260429T_next_gte_small_st/thenlper_gte-small/sweep/sochdb_grpc_quality.json"
+  }
+]

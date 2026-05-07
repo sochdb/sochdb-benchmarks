@@ -3,6 +3,7 @@
 This repository contains reproducible benchmarks comparing **SochDB** against other vector stores and agent memory systems.
 
 **📊 [See Published Results](PUBLISHED_RESULTS.md)** - Comprehensive benchmark findings with real LLM integration
+**🖥️ [See Server Benchmark Status](docs/SERVER_BENCHMARK_STATUS.md)** - Current hosted benchmark lane, SciFact quality takeaway, and staged scale plan
 
 ## Overview
 
@@ -31,7 +32,7 @@ We provide benchmarks across different dimensions:
 **CPU**: Intel(R) Xeon(R) Platinum 8370C @ 2.80GHz (3 vCPU)  
 **Command**:
 ```bash
-SOCHDB_LIB_PATH=/root/.pyenv/versions/3.12.12/lib/python3.12/site-packages/sochdb/lib/x86_64-unknown-linux-gnu/libsochdb_index.so \
+SOCHDB_LIB_PATH=/path/to/sochdb/lib/x86_64-unknown-linux-gnu/libsochdb_index.so \
   python3 benchmarks/comprehensive_benchmark.py
 ```
 
