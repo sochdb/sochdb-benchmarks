@@ -1,157 +1,64 @@
 # Staged Benchmark Plan
 
-For the current hosted benchmark state and the already-established retrieval
-quality takeaway, start with
-[`SERVER_BENCHMARK_STATUS.md`](./SERVER_BENCHMARK_STATUS.md).
+Start with [`SERVER_BENCHMARK_STATUS.md`](./SERVER_BENCHMARK_STATUS.md) for the
+current published results.
 
 ## Why staged
 
-The current benchmark server does not have enough free root-disk capacity for a
-clean, honest `1TB` run today.
+The current benchmark server does not yet have the storage profile for a clean
+final `1TB` benchmark claim.
 
-So we should run staged sizes:
+So the scale path stays staged:
 
 1. `10GB`
 2. `100GB`
 3. `250GB`
-4. `1TB` only after storage is expanded
+4. `1TB` after storage expansion
 
-## Current benchmark workspace
+## Current `10GB` status
 
-Server:
+The first staged dataset is:
 
-- `<benchmark-workspace>/datasets`
-- `<benchmark-workspace>/results`
-- `<benchmark-workspace>/logs`
-- `<benchmark-workspace>/work`
+- dataset: `synthetic_10gib_768d`
+- vectors: `3,495,253`
+- dimension: `768`
 
-## First staged `10GB` lane
+Published result summary:
 
-For the first large-scale system pass, use a synthetic normalized-vector dataset
-for throughput and latency characterization. Keep this separate from the SciFact
-quality lane.
+- build worked and produced about a `10,069 MB` index
+- corrected steady-state search result is about `506.63 QPS`
+- corrected sequential mean latency is about `1.97 ms`
+- one-time index load is about `106.85 s`
 
-Reusable scripts:
+Important note:
+
+- the original slow search number from the bulk CLI harness was a methodology
+  artifact, not the final engine result
+
+## Reusable scripts
 
 - `scripts/generate_staged_vector_dataset.py`
 - `scripts/run_sochdb_stage_vector.sh`
 - `benchmarks/run_bulk_vector_workload.py`
 
-Current server state:
+## What this lane is for
 
-- run `20260503T_stage10gb_d768` completed on the benchmark server
-- dataset: `synthetic_10gib_768d`
-- the first published run used the compiled `sochdb-bulk` binary for build/query
-- a later corrected rerun used the in-process native `HnswIndex.load(...)` +
-  `index.search(...)` path from `run_10gb_bench.py`
+This lane measures:
 
-Current outcome:
-
-- build completed successfully for `3,495,253` vectors at about `892 vec/s`
-- output index size was about `10,069 MB`
-- the original published `0.0091 QPS` / `109,814 ms p50` search result is now
-  understood to be a harness artifact, not the true steady-state search speed
-- the corrected May 12 native rerun measured about `506.6 QPS` with about
-  `1.87 ms p50` and `1.97 ms` mean latency after a one-time `106.85 s` index
-  load
-- the next priority is publishing the corrected native lane cleanly and then
-  continuing the staged scale path with the right measurement method
-
-Methodology warning:
-
-- the original slow search number came from a subprocess-per-query bulk CLI
-  path that reloaded the large index repeatedly
-- do not treat that number as the engine's steady-state search performance
-
-What this lane measures:
-
-- insert throughput
+- build throughput
 - search QPS
-- search latency percentiles
-- dataset payload size and run metadata
+- search latency
+- index size at scale
 
-What it does not claim:
+This lane does not measure:
 
-- retrieval quality on BEIR/SciFact
-- production corpus realism
+- retrieval relevance quality
+- semantic usefulness on real-world corpora
 
-Example:
+## Next step
 
-```bash
-TARGET_GIB=10 DIM=768 \
-$HOME/sochdb-benchmark-runs/work/run_sochdb_stage_vector.sh
-```
+Use the corrected native steady-state methodology for the next stages:
 
-## Pilot runner
-
-The first reusable runner is:
-
-- `scripts/run_sochdb_grpc_pilot.sh`
-
-It wraps the gRPC retrieval benchmark and writes:
-
-- result JSON
-- metadata JSON
-- full log
-
-## Example
-
-```bash
-DATASET_DIR=$HOME/sochdb-benchmark-runs/datasets/scifact \
-EMBEDDING_DIR=$HOME/sochdb-benchmark-runs/datasets/scifact-embeddings \
-$HOME/sochdb-benchmark-runs/work/run_sochdb_grpc_pilot.sh
-```
-
-## Quality-first benchmark lane
-
-For quality work, we should avoid mixing too many variables at once.
-
-The evaluation order should be:
-
-1. fix the dataset
-2. fix the embedding model
-3. sweep HNSW settings
-4. compare recall / nDCG / latency
-5. only then compare different embedding models
-
-The first quality sweep runner is:
-
-- `scripts/run_sochdb_grpc_quality_sweep.sh`
-
-It compares three useful HNSW profiles:
-
-- `fast`
-- `balanced`
-- `quality`
-
-and writes:
-
-- per-run result JSON
-- summary JSON
-- summary table text
-
-## Server-only embedding bakeoff
-
-If we want to improve retrieval quality, the next likely lever after HNSW sweeps is embeddings.
-
-The server-only runner for that is:
-
-- `scripts/run_sochdb_embedding_bakeoff.sh`
-
-It does this on the server:
-
-1. generates embeddings for each configured model
-2. runs the same HNSW quality sweep for each embedding set
-3. writes one result directory per model
-
-That keeps the heavy work off the laptop and keeps the comparison methodology clean.
-
-When models need different embedding backends, use `MODEL_BACKENDS` to override
-the default backend per model. Example:
-
-```bash
-DATASET_DIR=$HOME/sochdb-benchmark-runs/datasets/scifact \
-MODEL_BACKENDS=thenlper/gte-small=sentence-transformers \
-MODELS=BAAI/bge-small-en-v1.5,thenlper/gte-small \
-$HOME/sochdb-benchmark-runs/work/run_sochdb_embedding_bakeoff.sh
-```
+1. publish `100GB`
+2. publish `250GB`
+3. defer `1TB` until storage is expanded
