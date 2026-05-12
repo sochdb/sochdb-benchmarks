@@ -5,6 +5,22 @@ This repository contains reproducible benchmarks comparing **SochDB** against ot
 **📊 [See Published Results](PUBLISHED_RESULTS.md)** - Comprehensive benchmark findings with real LLM integration
 **🖥️ [See Server Benchmark Status](docs/SERVER_BENCHMARK_STATUS.md)** - Current hosted benchmark lane, SciFact quality takeaway, and staged scale plan
 
+## Current Highlights
+
+Latest published benchmark takeaways:
+
+- **Quality**: Best current SciFact result uses `BAAI/bge-base-en-v1.5`
+  with `recall@5 = 0.8121`, `MRR = 0.7017`, and `nDCG@5 = 0.7258`
+- **Scale**: The corrected `10GB` staged run reached about `506.63 QPS`
+  with about `1.97 ms` mean latency after a one-time `106.85 s` index load
+- **Methodology**: The earlier `~110s/query` `10GB` result came from a bad
+  harness path and is not the real steady-state engine search number
+
+For the latest published benchmark state, see:
+
+- [docs/SERVER_BENCHMARK_STATUS.md](docs/SERVER_BENCHMARK_STATUS.md)
+- [docs/STAGED_BENCHMARK_PLAN.md](docs/STAGED_BENCHMARK_PLAN.md)
+
 ## Overview
 
 We provide benchmarks across different dimensions:
