@@ -1,0 +1,44 @@
+{
+  "load_s": 106.85488888109103,
+  "search_sequential": {
+    "total_s": 1.973815259989351,
+    "qps": 506.6330270470171,
+    "mean_ms": 1.973815259989351,
+    "p50_ms": 1.8717250786721706,
+    "p95_ms": 2.4010292254388332,
+    "p99_ms": 6.252808030694723
+  },
+  "search_batch": {
+    "total_s": 2.808144075796008,
+    "qps": 356.1070846112253,
+    "per_query_ms": 2.808144075796008
+  },
+  "search_batch_ef64": {
+    "qps": 358.62969130334096,
+    "per_query_ms": 2.788391547743231
+  },
+  "search_batch_ef128": {
+    "qps": 358.11082750298215,
+    "per_query_ms": 2.792431625071913
+  },
+  "search_batch_ef256": {
+    "qps": 359.017884829031,
+    "per_query_ms": 2.785376557148993
+  },
+  "search_batch_ef512": {
+    "qps": 356.51812853303915,
+    "per_query_ms": 2.8049064548686147
+  },
+  "config": {
+    "num_vectors": 3495253,
+    "num_queries": 1000,
+    "dimension": 768,
+    "M": 32,
+    "ef_construction": 200,
+    "ef_search": 64,
+    "k": 10,
+    "batch_size": 5000
+  },
+  "timestamp": "2026-05-12T08:23:20.389332",
+  "workload": "sochdb_native_10gb"
+}

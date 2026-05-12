@@ -41,16 +41,27 @@ Current server state:
 
 - run `20260503T_stage10gb_d768` completed on the benchmark server
 - dataset: `synthetic_10gib_768d`
-- runner path now uses the compiled `sochdb-bulk` binary for index build/query
-- this avoids the stale in-process `VectorIndex` path that failed on the hosted box
+- the first published run used the compiled `sochdb-bulk` binary for build/query
+- a later corrected rerun used the in-process native `HnswIndex.load(...)` +
+  `index.search(...)` path from `run_10gb_bench.py`
 
 Current outcome:
 
 - build completed successfully for `3,495,253` vectors at about `892 vec/s`
 - output index size was about `10,069 MB`
-- search throughput was only about `0.0091 QPS`
-- `p50` query latency was about `109,814 ms`
-- the next priority is query-path investigation before moving on to `100GB`
+- the original published `0.0091 QPS` / `109,814 ms p50` search result is now
+  understood to be a harness artifact, not the true steady-state search speed
+- the corrected May 12 native rerun measured about `506.6 QPS` with about
+  `1.87 ms p50` and `1.97 ms` mean latency after a one-time `106.85 s` index
+  load
+- the next priority is publishing the corrected native lane cleanly and then
+  continuing the staged scale path with the right measurement method
+
+Methodology warning:
+
+- the original slow search number came from a subprocess-per-query bulk CLI
+  path that reloaded the large index repeatedly
+- do not treat that number as the engine's steady-state search performance
 
 What this lane measures:
 

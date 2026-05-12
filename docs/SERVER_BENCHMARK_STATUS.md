@@ -60,6 +60,8 @@ Local snapshots now checked into this repo:
 - [`reports/runs/20260429T_next_gte_small_st_embedding_metadata.json`](../reports/runs/20260429T_next_gte_small_st_embedding_metadata.json)
 - [`reports/runs/20260503T_stage10gb_d768_sochdb_vector_summary.json`](../reports/runs/20260503T_stage10gb_d768_sochdb_vector_summary.json)
 - [`reports/runs/20260503T_stage10gb_d768_metadata.json`](../reports/runs/20260503T_stage10gb_d768_metadata.json)
+- [`reports/runs/20260512T_10gb_optimized_native_summary.json`](../reports/runs/20260512T_10gb_optimized_native_summary.json)
+- [`reports/runs/20260512T_10gb_optimized_native_metadata.json`](../reports/runs/20260512T_10gb_optimized_native_metadata.json)
 
 ## Established quality finding
 
@@ -194,9 +196,9 @@ For large-scale system work:
 3. run `250GB` only after confirming disk headroom
 4. defer `1TB` until storage is expanded
 
-## Current staged run
+## Current staged `10GB` status
 
-The first staged large-scale run is now complete:
+The first staged large-scale run is now understood in two parts:
 
 - run id: `20260503T_stage10gb_d768`
 - dataset: `synthetic_10gib_768d`
@@ -208,14 +210,24 @@ The first staged large-scale run is now complete:
 - local summary: [`reports/runs/20260503T_stage10gb_d768_sochdb_vector_summary.json`](../reports/runs/20260503T_stage10gb_d768_sochdb_vector_summary.json)
 - local metadata: [`reports/runs/20260503T_stage10gb_d768_metadata.json`](../reports/runs/20260503T_stage10gb_d768_metadata.json)
 
+Corrected native rerun:
+
+- run id: `20260512T_10gb_optimized_native`
+- workload: `sochdb_native_10gb`
+- server script: `run_10gb_bench.py`
+- local summary: [`reports/runs/20260512T_10gb_optimized_native_summary.json`](../reports/runs/20260512T_10gb_optimized_native_summary.json)
+- local metadata: [`reports/runs/20260512T_10gb_optimized_native_metadata.json`](../reports/runs/20260512T_10gb_optimized_native_metadata.json)
+
 Important implementation note:
 
-- the staged lane now uses the compiled `sochdb-bulk` binary on the server for
-  build and query operations
-- this replaced the earlier Python-only workload path, which failed on the
-  hosted machine because the stale `VectorIndex` import path was not available
+- the first successful end-to-end staged run used the compiled `sochdb-bulk`
+  path because the old Python server environment was blocked
+- that got the lane running, but it was not a trustworthy steady-state repeated
+  query benchmark
+- the corrected May 12 rerun used `sochdb.HnswIndex.load(...)` once and then
+  in-process `index.search(...)` / `index.search_batch(...)`
 
-### `10GB` staged result
+### What the first published `10GB` run proved
 
 What succeeded:
 
@@ -224,7 +236,7 @@ What succeeded:
 - observed build throughput was about `891.6 vec/s`
 - output index size was about `10,069.1 MB`
 
-What failed the performance bar:
+What looked bad at first:
 
 - `250` queries took about `27,455.91 s`
 - search throughput was only about `0.0091 QPS`
@@ -232,13 +244,32 @@ What failed the performance bar:
 - `p95` latency was about `110,108 ms`
 - `mean` latency was about `109,822 ms`
 
+Why that result was misleading:
+
+- that runner used `bulk_query_from_file(...)`, which shells out once per query
+- the CLI query path loads the large index before searching
+- the benchmark therefore measured repeated subprocess startup and repeated index
+  reload more than it measured real steady-state ANN search
+
+### Corrected `10GB` native rerun
+
+The verified May 12 rerun on the server showed:
+
+- one-time index load: about `106.85 s`
+- sequential search: about `506.63 QPS`
+- sequential mean latency: about `1.97 ms`
+- sequential `p50`: about `1.87 ms`
+- sequential `p95`: about `2.40 ms`
+- batch search: about `356 QPS`
+
 Interpretation:
 
-- the staged runner itself is now working end to end
-- the bottleneck has moved from benchmark plumbing to SochDB query-path behavior
-- we should not scale this lane to `100GB` yet
-- the next benchmark task is diagnosing why the current search path is roughly
-  `~110 s` per query at `10GB`
+- the catastrophic `~110 s/query` result was a benchmark harness artifact
+- the corrected in-process search result is the meaningful steady-state number
+- the large-scale story is now materially stronger than the old published docs
+  suggested
+- we should use the corrected native path as the baseline for future staged
+  `100GB` and `250GB` work
 
 ## Scripts that define the server lane
 
@@ -253,8 +284,11 @@ Related planning docs:
 
 ## What is still pending
 
-- investigate the `10GB` search-latency failure before running `100GB`
-- complete the staged `10GB` -> `100GB` -> `250GB` scale path after that
+- replace the old misleading `10GB` interpretation everywhere it still appears
+- decide whether to publish the corrected native rerun as the canonical `10GB`
+  search result in a dedicated comparison doc/table
+- continue the staged `10GB` -> `100GB` -> `250GB` scale path using the native
+  steady-state methodology
 - defer `1TB` claims until storage is expanded
 
 This file should be the first place to update whenever new server benchmark work
