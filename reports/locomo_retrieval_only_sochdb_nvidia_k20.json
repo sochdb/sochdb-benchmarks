@@ -1,0 +1,73 @@
+{
+  "benchmark": "locomo-retrieval-only",
+  "system": "hybrid_bm25_sochdb_nvidia_nvidia/llama_nemotron_embed_1b_v2",
+  "mode": "retrieval",
+  "dataset": {
+    "questions": 1986,
+    "memory_rows": 5882,
+    "source": "LoCoMo converted QA split"
+  },
+  "configuration": {
+    "sparse_retriever": "bm25",
+    "dense_backend": "sochdb_grpc",
+    "embedding_model": "nvidia/llama-nemotron-embed-1b-v2",
+    "fusion": "rrf",
+    "k": 20,
+    "candidate_k": 100,
+    "bm25_weight": 1.5,
+    "vector_weight": 0.75
+  },
+  "result": {
+    "evidence_hit_rate": 0.7056145675265554,
+    "evidence_recall": 0.6521956301315214,
+    "avg_context_tokens": 657.9828801611279,
+    "avg_latency_ms": 200.8101157185054,
+    "p50_latency_ms": 200.1276759983739,
+    "p95_latency_ms": 203.82946400059154
+  },
+  "by_category": {
+    "adversarial": {
+      "n_questions": 446,
+      "evidence_hit_rate": 0.7533632286995515,
+      "evidence_recall": 0.7455156950672646,
+      "avg_context_tokens": 668.5874439461884,
+      "avg_latency_ms": 200.8726377667789
+    },
+    "multi_hop": {
+      "n_questions": 96,
+      "evidence_hit_rate": 0.4157303370786517,
+      "evidence_recall": 0.30582427046405897,
+      "avg_context_tokens": 646.2083333333334,
+      "avg_latency_ms": 200.85095930206384
+    },
+    "open_domain": {
+      "n_questions": 841,
+      "evidence_hit_rate": 0.7336504161712247,
+      "evidence_recall": 0.7209671026555688,
+      "avg_context_tokens": 656.268727705113,
+      "avg_latency_ms": 200.89632924729193
+    },
+    "single_hop": {
+      "n_questions": 282,
+      "evidence_hit_rate": 0.5800711743772242,
+      "evidence_recall": 0.32712598113422237,
+      "avg_context_tokens": 650.0780141843971,
+      "avg_latency_ms": 200.66418029087566
+    },
+    "temporal": {
+      "n_questions": 321,
+      "evidence_hit_rate": 0.75625,
+      "evidence_recall": 0.7231770833333333,
+      "avg_context_tokens": 658.2056074766355,
+      "avg_latency_ms": 200.6133630559836
+    }
+  },
+  "notes": [
+    "Retrieval-only benchmark; does not measure answer-generation accuracy.",
+    "BM25 is external sparse lexical retrieval.",
+    "NVIDIA Nemotron is external dense embedding generation.",
+    "SochDB is used as the dense vector backend through gRPC.",
+    "Latency reflects remote unary gRPC calls, not colocated SochDB core-search latency.",
+    "No real endpoint addresses or API keys are included."
+  ]
+}
