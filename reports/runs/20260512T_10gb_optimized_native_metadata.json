@@ -1,0 +1,29 @@
+{
+  "run_id": "20260512T_10gb_optimized_native",
+  "timestamp_utc": "2026-05-12T08:23:20.389332",
+  "dataset_name": "synthetic_10gib_768d",
+  "dataset_dir": "<benchmark-workspace>/datasets/synthetic_10gib_768d",
+  "result_json": "<benchmark-workspace>/results/10gb_optimized/results_m16.json",
+  "workload": "sochdb_native_10gb",
+  "methodology": {
+    "script": "<benchmark-workspace>/work/run_10gb_bench.py",
+    "search_path": "in-process native extension",
+    "index_load": "load once before repeated queries",
+    "warmup_queries": 10,
+    "notes": [
+      "This rerun avoids the per-query subprocess path used by the earlier bulk CLI harness.",
+      "It should be treated as the corrected steady-state search measurement for the loaded index.",
+      "This artifact was verified on the server and then copied into the repo."
+    ]
+  },
+  "config": {
+    "num_vectors": 3495253,
+    "num_queries": 1000,
+    "dimension": 768,
+    "M": 32,
+    "ef_construction": 200,
+    "ef_search": 64,
+    "k": 10,
+    "batch_size": 5000
+  }
+}
