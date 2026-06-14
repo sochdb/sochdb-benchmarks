@@ -1,0 +1,108 @@
+{
+  "self_retrieval": {
+    "passed": 10,
+    "total": 10,
+    "success_rate": 1.0,
+    "details": [
+      {
+        "id": 0,
+        "found": true,
+        "top_result": 0,
+        "distance": 0.0
+      },
+      {
+        "id": 10,
+        "found": true,
+        "top_result": 10,
+        "distance": -1.1920928955078125e-07
+      },
+      {
+        "id": 20,
+        "found": true,
+        "top_result": 20,
+        "distance": -2.384185791015625e-07
+      },
+      {
+        "id": 30,
+        "found": true,
+        "top_result": 30,
+        "distance": 2.384185791015625e-07
+      },
+      {
+        "id": 40,
+        "found": true,
+        "top_result": 40,
+        "distance": 5.960464477539063e-08
+      },
+      {
+        "id": 50,
+        "found": true,
+        "top_result": 50,
+        "distance": 0.0
+      },
+      {
+        "id": 60,
+        "found": true,
+        "top_result": 60,
+        "distance": 0.0
+      },
+      {
+        "id": 70,
+        "found": true,
+        "top_result": 70,
+        "distance": -1.1920928955078125e-07
+      },
+      {
+        "id": 80,
+        "found": true,
+        "top_result": 80,
+        "distance": 5.960464477539063e-08
+      },
+      {
+        "id": 90,
+        "found": true,
+        "top_result": 90,
+        "distance": -1.1920928955078125e-07
+      }
+    ]
+  },
+  "recall_at_k": {
+    "avg_recall": 1.0,
+    "min_recall": 1.0,
+    "max_recall": 1.0,
+    "threshold": 0.9,
+    "passed": "True"
+  },
+  "latency": {
+    "p50_ms": 0.12545849313028157,
+    "p95_ms": 0.13860060134902596,
+    "p99_ms": 0.14275128836743534,
+    "avg_ms": 0.12701711966656148
+  },
+  "insert": {
+    "vectors": 10000,
+    "time_sec": 0.25380458298604935,
+    "throughput": 39400.39175947292
+  },
+  "qps": {
+    "queries": 1000,
+    "time_sec": 0.12580179201904684,
+    "qps": 7949.01236262673
+  },
+  "vs_chromadb": {
+    "sochdb": {
+      "insert_time": 0.06939308403525501,
+      "insert_rate": 72053.28988490785,
+      "search_p50_ms": 0.07099949289113283
+    },
+    "chromadb": {
+      "insert_time": 0.20256495801731944,
+      "insert_rate": 24683.44006258228,
+      "search_p50_ms": 0.41281248559243977
+    },
+    "speedup": {
+      "insert": 2.919094328109221,
+      "search": 5.81430188840118
+    }
+  }
+}

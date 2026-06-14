@@ -1,0 +1,22 @@
+[
+  {
+    "system": "SochDB",
+    "insert_avg_ms": 29.287513432343705,
+    "search_p50_ms": 7.23908405052498,
+    "search_p95_ms": 10.607416974380612,
+    "search_p99_ms": 13.981666008476168,
+    "search_avg_ms": 8.231297498568892,
+    "context_avg_tokens": 35.39,
+    "recall_avg": 0.0
+  },
+  {
+    "system": "ChromaDB",
+    "insert_avg_ms": 10.839826262627657,
+    "search_p50_ms": 8.963499974925071,
+    "search_p95_ms": 17.004167020786554,
+    "search_p99_ms": 28.240500018000603,
+    "search_avg_ms": 10.023845888208598,
+    "context_avg_tokens": 35.39,
+    "recall_avg": 0.0
+  }
+]

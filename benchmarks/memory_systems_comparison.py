@@ -26,8 +26,18 @@ from datetime import datetime
 import numpy as np
 import tiktoken
 
-# Azure OpenAI
-from openai import AzureOpenAI
+try:
+    from benchmarks.llm_client import (
+        create_chat_client,
+        create_embedding_client,
+        chat_model_name,
+    )
+except ImportError:
+    from llm_client import (
+        create_chat_client,
+        create_embedding_client,
+        chat_model_name,
+    )
 
 
 # =============================================================================
@@ -198,21 +208,18 @@ class BenchmarkQueries:
 class SochDBMemory:
     """SochDB-based agent memory."""
 
-    def __init__(self, client: AzureOpenAI, config: Config):
+    def __init__(self, embedder, config: Config):
         from sochdb import VectorIndex
-        self.client = client
+        self.embedder = embedder
         self.config = config
-        self.index = VectorIndex(dimension=config.embedding_dim, max_connections=32, ef_construction=200)
+        dim = getattr(embedder, "dimension", config.embedding_dim)
+        self.index = VectorIndex(dimension=dim, max_connections=32, ef_construction=200)
         self.memories: List[Dict] = []
         self.tokenizer = tiktoken.get_encoding("cl100k_base")
 
     def embed(self, texts: List[str]) -> np.ndarray:
         """Embed texts."""
-        response = self.client.embeddings.create(
-            model=self.config.azure_embedding_deployment,
-            input=texts
-        )
-        return np.array([item.embedding for item in response.data], dtype=np.float32)
+        return self.embedder.embed(texts)
 
     def add(self, text: str, metadata: Dict) -> float:
         """Add memory."""
@@ -253,9 +260,9 @@ class SochDBMemory:
 class ChromaDBMemory:
     """ChromaDB-based agent memory (as comparison)."""
 
-    def __init__(self, client: AzureOpenAI, config: Config):
+    def __init__(self, embedder, config: Config):
         import chromadb
-        self.client = client
+        self.embedder = embedder
         self.config = config
         self.chroma_client = chromadb.Client()
         self.collection = self.chroma_client.create_collection(
@@ -267,11 +274,7 @@ class ChromaDBMemory:
 
     def embed(self, texts: List[str]) -> np.ndarray:
         """Embed texts."""
-        response = self.client.embeddings.create(
-            model=self.config.azure_embedding_deployment,
-            input=texts
-        )
-        return np.array([item.embedding for item in response.data], dtype=np.float32)
+        return self.embedder.embed(texts)
 
     def add(self, text: str, metadata: Dict) -> float:
         """Add memory."""
@@ -356,11 +359,9 @@ class MemorySystemBenchmark:
 
     def __init__(self, config: Config):
         self.config = config
-        self.client = AzureOpenAI(
-            api_key=config.azure_api_key,
-            api_version=config.azure_api_version,
-            azure_endpoint=config.azure_endpoint
-        )
+        self.embedder = create_embedding_client(config)
+        self.chat_client = create_chat_client(config)
+        self.chat_model = chat_model_name(config)
 
     def run_benchmark(self, memory_system, system_name: str) -> BenchmarkResults:
         """Run benchmark on a memory system."""
@@ -428,18 +429,33 @@ class MemorySystemBenchmark:
         print(f"\n  Test Configuration:")
         print(f"    Conversations: {len(ConversationDataset.get_conversations())}")
         print(f"    Test Queries: {self.config.num_test_queries}")
-        print(f"    LLM: Azure OpenAI {self.config.azure_chat_deployment}")
-        print(f"    Embeddings: {self.config.azure_embedding_deployment}")
+        llm_backend = os.getenv("OPENAI_BASE_URL") or f"Azure OpenAI {self.config.azure_chat_deployment}"
+        embed_backend = getattr(self.embedder, "_model", None)
+        if hasattr(embed_backend, "get_sentence_embedding_dimension"):
+            embed_label = os.getenv("LOCAL_EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+        else:
+            embed_label = os.getenv("OPENAI_EMBEDDING_MODEL", self.config.azure_embedding_deployment)
+        print(f"    LLM endpoint: {llm_backend}")
+        print(f"    Chat model: {self.chat_model}")
+        print(f"    Embeddings: {embed_label}")
+
+        # Verify LLM endpoint is reachable
+        try:
+            models = self.chat_client.models.list()
+            model_ids = [m.id for m in models.data]
+            print(f"    Available models: {', '.join(model_ids)}")
+        except Exception as exc:
+            print(f"    Warning: could not list models: {exc}")
 
         all_results = []
 
         # SochDB
-        sochdb = SochDBMemory(self.client, self.config)
+        sochdb = SochDBMemory(self.embedder, self.config)
         sochdb_results = self.run_benchmark(sochdb, "SochDB")
         all_results.append(sochdb_results.get_stats())
 
         # ChromaDB
-        chromadb = ChromaDBMemory(self.client, self.config)
+        chromadb = ChromaDBMemory(self.embedder, self.config)
         chromadb_results = self.run_benchmark(chromadb, "ChromaDB")
         all_results.append(chromadb_results.get_stats())
 
@@ -500,9 +516,11 @@ def main():
     """Run memory systems benchmark."""
     config = Config()
 
-    if not config.azure_api_key or not config.azure_endpoint:
-        print("Error: Azure OpenAI credentials not found")
-        print("Please set AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT")
+    has_openai_compat = bool(os.getenv("OPENAI_BASE_URL"))
+    has_azure = bool(config.azure_api_key and config.azure_endpoint)
+    if not has_openai_compat and not has_azure:
+        print("Error: LLM credentials not found")
+        print("Set OPENAI_BASE_URL (vLLM/OpenAI-compatible) or AZURE_OPENAI_API_KEY + AZURE_OPENAI_ENDPOINT")
         sys.exit(1)
 
     benchmark = MemorySystemBenchmark(config)
